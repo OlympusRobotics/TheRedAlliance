@@ -10,7 +10,7 @@ poetry and pip
 4. Data analysis - sort by score, etc
 5. Make it look cool
 6. Cross compatibility
-7. Wireless capability - bluetooth
+7. Wireless capability - possibly bluetooth integration
 8. Hosted on raspi
 9. Cloud storage - google drive, spreadsheets
 10. Integration with blue alliance
