@@ -1,4 +1,3 @@
-
 from flask import Flask, redirect, url_for, render_template, request, session, flash
 from datetime import timedelta
 from flask_sqlalchemy import SQLAlchemy
@@ -35,9 +34,4 @@ def login():
 		flash("Data recieved!", "info")
 	
 	return render_template("scouting.html")
-
-if __name__ == "__main__":
-	db.create_all()
-	app.debug = True
-	app.run(host="127.0.0.1", port = 5000)
 
