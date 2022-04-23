@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="hero is-transparent is-halfheight ">
+    <div class="title hero-head" style="text-align: center; margin-top: 5rem; color:rgb(201, 81, 105);">
+        Scout Sign In
+        <hr>
+    </div>
+
+    <div class="hero-body">
+        <div class="container">
+          <div class="columns is-centered">
+            <div class="column is-5-tablet is-4-desktop is-3-widescreen">
+              <form action="" class="box">
+                <div class="field">
+                  <label for="" class="label">Name</label>
+                  <div class="control has-icons-left">
+                    <input type="name" placeholder="Jason Quang" class="input" required>
+                    <span class="icon is-small is-left">
+                      <i class="fa fa-envelope"></i>
+                    </span>
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="" class="label">Scout Code</label>
+                  <div class="control has-icons-left">
+                    <input type="password" placeholder="*******" class="input" required>
+                    <span class="icon is-small is-left">
+                      <i class="fa fa-lock"></i>
+                    </span>
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="" class="checkbox">
+                    <input type="checkbox">
+                   Remember me
+                  </label>
+                </div>
+                <div class="field">
+                  <button class="button is-success">
+                    Login
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
