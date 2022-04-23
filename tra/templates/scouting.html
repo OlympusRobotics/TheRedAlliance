@@ -1,0 +1,30 @@
+{% extends "test.html"%}
+{% block title %}Page{% endblock %}
+{% block content %}
+	{%with messages = get_flashed_messages()%}
+		{%if messages%}
+			{%for msg in messages%}
+				<p>{{msg}}</p>
+			{%endfor%}
+		{%endif%}
+	{%endwith%}
+
+
+<form action="#" method="post">
+  <div class="form-row align-items-center">
+    <div class="col-auto">
+      <label class="sr-only" for="inlineFormInputGroup">A form</label>
+      <div class="input-group mb-2">
+        <div class="input-group-prepend">
+          <div class="input-group-text">@</div>
+        </div>
+        <input type="text" name="scout_data"/>
+      </div>
+    </div>
+    <div class="col-auto">
+      <button type="submit" class="btn btn-primary mb-2" value="sumbit">Submit</button>
+    </div>
+  </div>
+</form>
+
+{% endblock %}
