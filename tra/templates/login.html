@@ -3,20 +3,32 @@
 {% block content %}
 
 <div class="hero is-transparent is-halfheight ">
-    <div class="title hero-head" style="text-align: center; margin-top: 5rem; color:rgb(201, 81, 105);">
+    <div class="title hero-head" style="text-align: center; margin-top: 1.5rem; color:rgb(201, 81, 105);">
         Scout Sign In
         <hr>
     </div>
+    <div class="container">
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          {% for i, message in enumerate(messages) %}
+          <div class="notification is-danger is-light animate__animated animate__backInDown" style="padding: 1.7rem; margin-top: 0px; margin-bottom: 0px; animation-delay: calc(100ms * {{i}});" role="alert">
+            <button class="delete"></button>
+            {{message}}
+          </div>
+        {% endfor %}
+        {% endif %}
+      {% endwith %}
+    </div>
 
     <div class="hero-body">
-        <div class="container">
+        <div class="container animate__animated animate__fadeInUp">
           <div class="columns is-centered">
             <div class="column is-5-tablet is-4-desktop is-3-widescreen">
-              <form action="" class="box">
+              <form method="POST" action="" class="box">
                 <div class="field">
                   <label for="" class="label">Name</label>
                   <div class="control has-icons-left">
-                    <input type="name" placeholder="Jason Quang" class="input" required>
+                    <input name="name" value="{{ request.form['name'] }}" type="name" placeholder="Jason Quang" class="input" required>
                     <span class="icon is-small is-left">
                       <i class="fa fa-envelope"></i>
                     </span>
@@ -25,7 +37,7 @@
                 <div class="field">
                   <label for="" class="label">Scout Code</label>
                   <div class="control has-icons-left">
-                    <input type="password" placeholder="*******" class="input" required>
+                    <input name="code" value="{{ request.form['code'] }}" type="password" placeholder="*******" class="input" required>
                     <span class="icon is-small is-left">
                       <i class="fa fa-lock"></i>
                     </span>
@@ -33,7 +45,7 @@
                 </div>
                 <div class="field">
                   <label for="" class="checkbox">
-                    <input type="checkbox">
+                    <input name="persist" type="checkbox">
                    Remember me
                   </label>
                 </div>
