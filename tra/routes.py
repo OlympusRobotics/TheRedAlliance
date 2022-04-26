@@ -1,5 +1,5 @@
-from re import L
 from tra import db, app
+from tra.helpers import admin_set
 from tra.models import ScoutResponse, Scout, Admin
 from flask import redirect, request, session, render_template, flash, escape, url_for, abort
 
@@ -7,6 +7,9 @@ from flask import redirect, request, session, render_template, flash, escape, ur
 @app.route("/")
 @app.route("/home")
 def home():
+    if "admin" in session:
+        redirect(url_for('admin'))
+
     if "name" not in session:
         return redirect(url_for("login"))
     # if the user is not logged in, then redirect back to login
@@ -40,35 +43,38 @@ def login():
 # handle admin login and setup
 @app.route("/login/admin", methods=["GET", "POST"])
 def admin_login():
-    admin = Admin.query.all()
+    
     if request.method == "POST":
         if "username" not in request.form or "password" not in request.form:
             abort(400)
 
         # dont allow usernames longer than 20 characters
-        if len("username") > 20:
+        if len(request.form["username"]) > 20:
             flash(f"Username cannot be more than 20 characters. Your username is {len(request.form['username'])} characters long")
             return redirect(url_for('admin_login'))
 
         # admin account still needs to be set
-        if len(admin) == 0:
+        if not admin_set():
             new_admin = Admin(escape(request.form["username"]), request.form["password"])
             db.session.add(new_admin)
             db.session.commit()
-            flash(f"Admin account {new_admin.username} created")
-            return redirect(url_for("admin"))
+            flash(f"Admin account {new_admin.username} created", "is-info")
+            return redirect(url_for("admin_login"))
 
-        # admin has already been created
-       # select the admin account 
-        admin = admin[0]
         # admin account has already been created. check creds
+        admin = Admin.query.all()[0]
         if request.form["username"] == admin.username \
             and request.form["password"] == admin.password:
+            # set the session to the key of the admin. This is what is used to check the 
+            # validity of the admin session
             session["admin"] = admin.key
             return redirect(url_for("admin"))
 
-    if len(admin) == 0:
-        # if no admin exists, then show the admin setup page
+        flash("Invalid Admin Login Credentials", "is-danger")
+        return redirect(url_for('admin_login')) 
+
+    # if no admin exists, then show the admin setup page
+    if not admin_set():
         flash("Looks like a scouting admin needs to be setup. Please set up an account here to begin managing scouts", category="is-primary")
         return render_template("admin_setup.html")
 
@@ -78,12 +84,12 @@ def admin_login():
 # main admin page and panel
 @app.route("/admin")
 def admin():
-    admin = Admin.query.all()
     # admin hasnt been set yet
-    if len(admin) == 0:
+    if not admin_set():
         return redirect(url_for("admin_login"))
     
-    admin = admin[0]
+    admin = Admin.query.all()[0]
+
     if "admin" in session:
         if session["admin"] != admin.key:
             abort(403)
