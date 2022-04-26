@@ -1,3 +1,4 @@
+import secrets
 from tra import db
 
 """
@@ -12,13 +13,15 @@ class Admin(db.Model):
     id = db.Column("id", db.Integer, primary_key=True)  # pk
     username = db.Column(db.String(64))
     password = db.Column(db.String(120))  # code used for accessing account
+    key = db.Column(db.String(512)) # key for authenticating the admin
 
     def __init__(self, username, password):
         self.username = username
         self.password = password
+        self.key = secrets.token_hex(256) # create key for auth
 
     def __repr__(self):
-        return f"Admin {self.username}\nScouts: {''.join([scout.__repr__ + ' ' for scout in self.scouts])}"
+        return f"Admin {self.username}"
 
 
 class Scout(db.Model):

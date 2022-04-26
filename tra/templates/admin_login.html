@@ -4,7 +4,7 @@
 
 <div class="hero is-transparent is-halfheight ">
   <div class="title hero-head" style="text-align: center; margin-top: 1.5rem; color:rgb(201, 81, 105);">
-    Admin Setup 
+    Admin Log In
     <hr>
   </div>
   <div class="container">
@@ -29,7 +29,7 @@
             <div class="field">
               <label for="" class="label">Username</label>
               <div class="control has-icons-left">
-                <input id="username" name="username" value="{{ request.form['username'] }}" type="name" placeholder="Jason Quang"
+                <input name="username" value="{{ request.form['username'] }}" type="name" placeholder="Jason Quang"
                   class="input" required>
                 <span class="icon is-small is-left">
                   <i class="fa fa-envelope"></i>
@@ -39,17 +39,7 @@
             <div class="field">
               <label for="" class="label">Password</label>
               <div class="control has-icons-left">
-                <input id="password" name="password" value="{{ request.form['password'] }}" type="password" placeholder="*******"
-                  class="input" required>
-                <span class="icon is-small is-left">
-                  <i class="fa fa-lock"></i>
-                </span>
-              </div>
-            </div>
-            <div class="field">
-              <label for="" class="label">Confirm Password</label>
-              <div class="control has-icons-left">
-                <input id="password-confirm" type="password" placeholder="*******"
+                <input name="password" value="{{ request.form['password'] }}" type="password" placeholder="*******"
                   class="input" required>
                 <span class="icon is-small is-left">
                   <i class="fa fa-lock"></i>
@@ -63,11 +53,10 @@
               </label>
             </div>
             <div class="field">
-              <button class="button is-success" disabled>
-                Set up
+              <button class="button is-success">
+                Login
               </button>
             </div>
-            <span id="form-feedback"></span>
           </form>
         </div>
       </div>

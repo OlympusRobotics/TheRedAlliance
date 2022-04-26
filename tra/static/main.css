@@ -1,1 +1,10 @@
-@import "/tra/static/node_modules/bulma/css/bulma.css"
+#form-feedback {
+    color: firebrick;
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.notification {
+    max-width: 25em;
+}
