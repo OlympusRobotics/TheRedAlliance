@@ -3,21 +3,21 @@
 {% block content %}
 
 <div class="hero is-transparent is-halfheight ">
-  <div class="title hero-head" style="text-align: center; margin-top: 1.5rem; color:rgb(128, 0, 0);">
-    Scout Sign In
+  <div class="title hero-head" style="text-align: center; margin-top: 1.5rem; color:rgb(201, 81, 105);">
+    Admin Log In
     <hr>
   </div>
   <div class="container">
     {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-    {% for category, message in messages %}
-    <div class="notification {{ category }} is-light animate__animated animate__backInRight"
-      style="padding: 2rem; margin-top: 0px; margin-bottom: 0px;" role="alert">
-      <button class="delete"></button>
-      {{message}}
-    </div>
-    {% endfor %}
-    {% endif %}
+      {% if messages %}
+        {% for category, message in messages %}
+        <div class="notification {{ category }} is-light animate__animated animate__backInRight"
+          style="padding: 2rem; margin-top: 0px; margin-bottom: 0px;" role="alert">
+          <button class="delete"></button>
+          {{message}}
+        </div>
+        {% endfor %}
+      {% endif %}
     {% endwith %}
   </div>
 
@@ -27,9 +27,9 @@
         <div class="column is-5-tablet is-4-desktop is-3-widescreen">
           <form method="POST" action="" class="box">
             <div class="field">
-              <label for="" class="label">Name</label>
+              <label for="" class="label">Username</label>
               <div class="control has-icons-left">
-                <input name="name" value="{{ request.form['name'] }}" type="name" placeholder="Jason Quang"
+                <input name="username" value="{{ request.form['username'] }}" type="name" placeholder="Jason Quang"
                   class="input" required>
                 <span class="icon is-small is-left">
                   <i class="fa fa-envelope"></i>
@@ -37,9 +37,9 @@
               </div>
             </div>
             <div class="field">
-              <label for="" class="label">Scout Code</label>
+              <label for="" class="label">Password</label>
               <div class="control has-icons-left">
-                <input name="code" value="{{ request.form['code'] }}" type="password" placeholder="*******"
+                <input name="password" value="{{ request.form['password'] }}" type="password" placeholder="*******"
                   class="input" required>
                 <span class="icon is-small is-left">
                   <i class="fa fa-lock"></i>

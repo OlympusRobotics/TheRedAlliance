@@ -1,0 +1,8 @@
+// file for adding jquery intellisense
+{
+    "typeAcquisition": {
+        "include": [
+            "jquery"
+        ]
+    }
+}

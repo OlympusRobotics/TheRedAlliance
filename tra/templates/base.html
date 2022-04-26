@@ -11,7 +11,7 @@
     {% endif %}
     <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='bulma/css/bulma.css')}}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='animate/animate.min.css') }}"
+    <link rel="stylesheet" href="{{ url_for('static', filename='animate/animate.min.css') }}">
     <script src="{{ url_for('static', filename='jquery/jquery.js') }}"></script>
 </head>
 
@@ -21,14 +21,15 @@
             <div id="navbarBasicExample" class="navbar-menu">
                 <div class="navbar-start">
                     <a class="navbar-item" href="{{ url_for('home') }}" style="font-size: 1.5rem;">
-                       The Red Alliance
+                        The Red Alliance
                     </a>
                     <a class="navbar-item">  
                     </a>
                 </div>
             </div>
         </nav>
-
+        
     </header>
     {% block content %}{% endblock %}
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
 </body>
