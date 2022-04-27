@@ -22,5 +22,20 @@ if (window.location.pathname == "/login/admin") {
     $("#password-confirm").on("keyup change", validatePassword);
 }
 //---------------------------------------------------
+// admin dashboard code -----------------------------
+if (window.location.pathname == "/admin") {
 
+    $("section").hide();
+
+    $("#dash-tabs div ul li").on('click', function() {
+        $(".is-active").toggleClass('is-active');
+        $(this).addClass('is-active');
+        // get the clicked tab id
+        let tab = $(this).attr('id');
+        $("section").hide();
+        // make visible the matching section
+        $('#' +tab + '-tab').show();
+
+    });
+}
     

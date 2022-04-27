@@ -1,6 +1,28 @@
 {% extends 'base.html' %}
 
 {% block content %}
-{{ admin.username}}
+
+<h1 class="title is-2">Admin Dashboard</h1>
+<div id="dash-tabs" class="container">
+    <div class="tabs is-large is-boxed">
+        <ul>
+            <!--The onload is to add data to each tab allowing access to it in main.js-->
+            <li id="scouts" class="is-active"><a>Scouts</a></li>
+            <li id="data"><a>Data</a></li>
+            <li id="settings"><a>Settings</a></li>
+        </ul>
+    </div>
+
+</div>
+
+<section id="scouts-tab">
+    Scouts
+</section>
+<section id="data-tab">
+    Data
+</section>
+<section id="settings-tab">
+    Settings 
+</section>
 
 {% endblock %}
