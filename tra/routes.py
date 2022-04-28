@@ -1,5 +1,6 @@
+import secrets
 from tra import db, app
-from tra.helpers import admin_set
+from tra.helpers import admin_set, check_admin_key
 from tra.models import ScoutResponse, Scout, Admin
 from flask import redirect, request, session, render_template, flash, escape, url_for, abort
 
@@ -35,6 +36,8 @@ def login():
                 return redirect(url_for("home"))
 
         flash("Invalid Scout Credentials", "is-danger")
+        # if the name entered is only one word, possible that user forgot to 
+        # put last name
         if len(request.form["name"].split()) < 2:   
             flash("Maybe you forgot to put your last name?", category="is-warning")
 
@@ -67,7 +70,9 @@ def admin_login():
             and request.form["password"] == admin.password:
             # set the session to the key of the admin. This is what is used to check the 
             # validity of the admin session
+            admin.key = secrets.token_hex(256)
             session["admin"] = admin.key
+            db.session.commit()
             return redirect(url_for("admin"))
 
         flash("Invalid Admin Login Credentials", "is-danger")
@@ -89,11 +94,15 @@ def admin():
         return redirect(url_for("admin_login"))
     
     admin = Admin.query.all()[0]
-
-    if "admin" in session:
-        if session["admin"] != admin.key:
+    if not check_admin_key(admin, session):
             abort(403)
-    return render_template("admin.html", admin=admin)
+    return render_template("admin.html", admin=admin, scouts=Scout.query.all())
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("home"))
+
 
 
 # This route is for testing writing to sql database

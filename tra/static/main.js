@@ -26,16 +26,28 @@ if (window.location.pathname == "/login/admin") {
 if (window.location.pathname == "/admin") {
 
     $("section").hide();
-
+// ------ Handlers for switching tabs    
+    // Initially show the scouts tab
+    $("#scouts-tab").show();    
     $("#dash-tabs div ul li").on('click', function() {
         $(".is-active").toggleClass('is-active');
         $(this).addClass('is-active');
-        // get the clicked tab id
         let tab = $(this).attr('id');
         $("section").hide();
         // make visible the matching section
-        $('#' +tab + '-tab').show();
-
+        $('#' +tab + '-tab').show(); 
     });
+    //------- New scout creation code
+    $("#create-new").on('click', function() {
+        var scoutCard = 
+`
+<div class="scout-card">
+    <span class="name"></span>
+</div>
+`
+        $(this).toggleClass("is-loading")
+        location.reload(true);
+    });
+
 }
     

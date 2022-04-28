@@ -1,3 +1,4 @@
+import datetime
 import secrets
 from tra import db
 
@@ -18,7 +19,6 @@ class Admin(db.Model):
     def __init__(self, username, password):
         self.username = username
         self.password = password
-        self.key = secrets.token_hex(256) # create key for auth
 
     def __repr__(self):
         return f"Admin {self.username}"
@@ -42,6 +42,10 @@ class ScoutResponse(db.Model):  # create table
     _id = db.Column("id", db.Integer, primary_key=True)  # pk
     scout_id = db.Column(db.Integer, db.ForeignKey("scout.id"))
     data = db.Column(db.String(1000000))  # json of the response provided by the scout
+    year = db.Column(db.Integer) # the year competition that the response is for
+    date = db.Column(db.DateTime)
 
-    def __init__(self, data):
+    def __init__(self, data, year):
         self.data = data
+        self.date = datetime.datetime.now()
+        self.year = year

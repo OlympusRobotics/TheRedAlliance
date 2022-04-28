@@ -8,7 +8,7 @@ app.config[
     "SQLALCHEMY_DATABASE_URI"
 ] = "sqlite:///data.sqlite3"  # config for database. data.sqlite3 is the table name
 app.config["SQLALCEHMY_TRACK_MODIFICATIONS"] = False
-app.permanent_session_lifetime = timedelta(minutes=5)
+app.permanent_session_lifetime = timedelta(days=3)
 db = SQLAlchemy(app)  # create a database object
 # needed for magic reasons
 from tra import routes

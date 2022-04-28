@@ -3,6 +3,7 @@
 {% block content %}
 
 <h1 class="title is-2">Admin Dashboard</h1>
+<hr class="title-hr">
 <div id="dash-tabs" class="container">
     <div class="tabs is-large is-boxed">
         <ul>
@@ -16,13 +17,37 @@
 </div>
 
 <section id="scouts-tab">
-    Scouts
+    <div class="container">
+        <div class="columns">
+            <div class="column">
+                <div class="add-scout-panel ">
+                    <input id="new-name" class="input is-primary" type="text" placeholder="Scout Name">
+                    <input id="new-code" class="input is-primary" type="password" placeholder="Scout Code">
+                    <div class="is-flex is-justify-content-right">
+                        <button id="create-new" class="button is-primary">+ New Scout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="columns is-centered">
+            <div class="column">
+                {% for scout in scouts %}
+                    <div class="scout-card">
+                        <span class="name">{{ scout.name }}</span>
+                    </div>
+                {% else %}
+                    No scouts
+                {% endfor %}
+
+            </div>
+        </div>
+    </div>
 </section>
 <section id="data-tab">
     Data
 </section>
 <section id="settings-tab">
-    Settings 
+    Settings
 </section>
 
 {% endblock %}
