@@ -12,7 +12,7 @@ then the Admin can view the data collected by the scouts
 
 class Admin(db.Model):
     id = db.Column("id", db.Integer, primary_key=True)  # pk
-    username = db.Column(db.String(64))
+    username = db.Column(db.String(64), unique=True)
     password = db.Column(db.String(120))  # code used for accessing account
     key = db.Column(db.String(512)) # key for authenticating the admin
 
@@ -26,7 +26,7 @@ class Admin(db.Model):
 
 class Scout(db.Model):
     id = db.Column("id", db.Integer, primary_key=True)  # pk
-    name = db.Column(db.String(64))
+    name = db.Column(db.String(64), unique=True)
     code = db.Column(db.String(12))  # code used for accessing account
     responses = db.relationship("ScoutResponse", backref="scout", lazy=True)
 

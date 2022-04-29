@@ -21,19 +21,23 @@
         <div class="columns">
             <div class="column">
                 <div class="add-scout-panel ">
-                    <input id="new-name" class="input is-primary" type="text" placeholder="Scout Name">
-                    <input id="new-code" class="input is-primary" type="password" placeholder="Scout Code">
+                    <input id="new-name" name="name" class="input is-primary" type="text" placeholder="Scout Name">
+                    <input id="new-code" name="code" class="input is-primary" type="password" placeholder="Scout Code">
                     <div class="is-flex is-justify-content-right">
-                        <button id="create-new" class="button is-primary">+ New Scout</button>
+                        <button id="create-new" class="button is-primary" disabled>+ New Scout</button>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="columns is-centered">
+        <div id="scout-cards" class="columns is-centered">
             <div class="column">
                 {% for scout in scouts %}
                     <div class="scout-card">
                         <span class="name">{{ scout.name }}</span>
+                        <div class="is-flex is-justify-content-right">
+                            <a class="button is-info">View Responses</a>
+                            <a class="button is-danger">Delete</a>
+                        </div>
                     </div>
                 {% else %}
                     No scouts

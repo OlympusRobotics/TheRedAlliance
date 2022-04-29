@@ -9,7 +9,7 @@ from flask import redirect, request, session, render_template, flash, escape, ur
 @app.route("/home")
 def home():
     if "admin" in session:
-        redirect(url_for('admin'))
+        redirect(url_for('admin_page'))
 
     if "name" not in session:
         return redirect(url_for("login"))
@@ -73,7 +73,7 @@ def admin_login():
             admin.key = secrets.token_hex(256)
             session["admin"] = admin.key
             db.session.commit()
-            return redirect(url_for("admin"))
+            return redirect(url_for("admin_page"))
 
         flash("Invalid Admin Login Credentials", "is-danger")
         return redirect(url_for('admin_login')) 
@@ -88,7 +88,7 @@ def admin_login():
 
 # main admin page and panel
 @app.route("/admin")
-def admin():
+def admin_page():
     # admin hasnt been set yet
     if not admin_set():
         return redirect(url_for("admin_login"))
@@ -103,7 +103,26 @@ def logout():
     session.clear()
     return redirect(url_for("home"))
 
-
+# route to create new scout
+@app.route("/admin/scout/new", methods=["POST"])
+def new_scout():
+    admin = Admin.query.all()[0]
+    # admin required
+    if not check_admin_key(admin, session):
+        abort(403)
+    if "name" not in request.form or "code" not in request.form:
+        abort(400)
+    scout_names = [scout.name for scout in Scout.query.all()]
+    if escape(request.form["name"]) in scout_names:
+        return {
+            "error" : f"P{request.form['name']} is already a scout"
+        }
+    scout = Scout(escape(request.form["name"]), request.form["code"])
+    db.session.add(scout)
+    db.session.commit()
+    return {"name" : scout.name}
+    
+    
 
 # This route is for testing writing to sql database
 @app.route("/test", methods=["POST", "GET"])  # specify methods and route
