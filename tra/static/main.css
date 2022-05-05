@@ -30,20 +30,17 @@ hr.title-hr {
     margin-bottom: 1.5em;
     border-radius: 10px;
     font-size: 1.2em;
-    transition: ease 0.2s; 
+    transition: ease 0.1s; 
 }
 
 .scout-card:hover {
-    transform: scale(1.1);
+    zoom: 1.02; 
+    -moz-transform: scale(1.02);
 }
 
 .scout-card .name{
     font-size: larger;
     font-weight: bold;
-}
-
-.scout-card.loading {
-    
 }
 
 .scout-card div {
@@ -63,7 +60,8 @@ hr.title-hr {
 }
 
 .add-scout-panel:hover {
-    transform: scale(1.1);
+    zoom: 1.05; 
+    -moz-transform: scale(1.05);
 }
 
 .add-scout-panel input {
@@ -72,5 +70,26 @@ hr.title-hr {
 .add-scout-panel div {
     display: inline-block;
 }
+
+.progress {
+    width: 60rem !important;
+}
+
+.form-card {
+    display: flex;
+    justify-content: space-between;
+    background-color: rgb(250, 250, 250);
+    padding: 1.5em;
+    margin-bottom: 1.5em;
+    border-radius: 10px;
+    font-size: 1.2em;
+    transition: ease 0.1s; 
+}
+
+.form-card:hover {
+    zoom: 1.02; 
+    -moz-transform: scale(1.02);
+}
+
 
   

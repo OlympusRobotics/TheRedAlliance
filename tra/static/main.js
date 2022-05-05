@@ -7,6 +7,13 @@ $('.notification .delete').on('click', function() {
     });
 })
 
+// Function to delete a scout when clicking the delete button
+function deleteScout(id) {
+    $.ajax(`/admin/scout/delete/${id}`, {type : "DELETE"})
+    .always(function () {
+        location.reload(true);
+    });
+}
 
 // Admin setup account code ------------------------
 if (window.location.pathname == "/login/admin") {
@@ -47,26 +54,26 @@ if (window.location.pathname == "/admin") {
             $("#create-new").prop("disabled", "disabled");
         }
     });
+    // handler for adding new scout
     $("#create-new").on('click', function() {
-        var scoutCard = 
+        var loadingScoutCard = 
 `
-<div class="scout-card loading">
-    <span class="name"></span>
-    <div class="is-flex is-justify-content-right">
-        <a class="button is-info">View Responses</a>
-        <a class="button is-danger">Delete</a>
+<div id="loading-card" class="scout-card loading is-flex is-justify-content-center">
+    <div>
+        <progress class="progress is-large is-danger" max="100">100%</progress>
     </div>
 </div>
-`
+`       
+        $("#scout-cards .column").prepend(loadingScoutCard);
+        
         $(this).toggleClass("is-loading");
         $.post("/admin/scout/new", {
                 name : $("#new-name").val(),
                 code : $("#new-code").val()
-            },
-            function (data, st) {
+            })
+            .always(function () {
                 location.reload(true);
-            }
-        ); 
+            });
     });
 }
     

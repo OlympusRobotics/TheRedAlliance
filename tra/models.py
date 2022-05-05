@@ -6,7 +6,11 @@ from tra import db
 Relationships:
 
 Admin creates as many scouts as needed, scouts create ScoutResponses, 
-then the Admin can view the data collected by the scouts
+then the Admin can view the data collected by the scouts.
+
+Custom forms are created and each question is stored as its own table 
+using the FormQuestion model.
+Scouts then sumbit ScoutResponses to them.
 """
 
 
@@ -25,10 +29,9 @@ class Admin(db.Model):
 
 
 class Scout(db.Model):
-    id = db.Column("id", db.Integer, primary_key=True)  # pk
+    _id = db.Column("id", db.Integer, primary_key=True)  # pk
     name = db.Column(db.String(64), unique=True)
     code = db.Column(db.String(12))  # code used for accessing account
-    responses = db.relationship("ScoutResponse", backref="scout", lazy=True)
 
     def __init__(self, name, code):
         self.name = name
@@ -37,15 +40,33 @@ class Scout(db.Model):
     def __repr__(self):
         return f"< {self.name}, {self.code}, {self.id} >"
 
+class Form(db.Model):
+    _id = db.Column("id", db.Integer, primary_key=True)  # pk
+    name = db.Column(db.String(64), unique=True)
+    questions = db.relationship("FormQuestion", backref="form", lazy=True)
+    responses = db.relationship("ScoutResponse", backref="form", lazy=True)
+
+    def __init__(self, name, questions):
+        self.name = name
+        # create FormQuestion model for each question in the form
+        self.questions = map(FormQuestion, questions)
+
+class FormQuestion(db.Model):
+    form_id = db.Column(db.Integer, db.ForeignKey("form._id"), primary_key=True)
+    question_type = db.Column(db.String(2000)) # the type of question e.i. radio button, check boxes, text input, etc
+    question_prompt = db.Column(db.String(200)) # the prompt for the question that will be shown 
+
+    def __init__(self, question):
+        self.question_prompt = question["prompt"]
+        self.question_type = question["type"]
 
 class ScoutResponse(db.Model):  # create table
-    _id = db.Column("id", db.Integer, primary_key=True)  # pk
-    scout_id = db.Column(db.Integer, db.ForeignKey("scout.id"))
+    form_id = db.Column(db.Integer, db.ForeignKey("form._id"), primary_key=True)
     data = db.Column(db.String(1000000))  # json of the response provided by the scout
-    year = db.Column(db.Integer) # the year competition that the response is for
+    form = db.Column(db.String(24)) # the form that the response is for
     date = db.Column(db.DateTime)
 
-    def __init__(self, data, year):
+    def __init__(self, data, form):
         self.data = data
         self.date = datetime.datetime.now()
-        self.year = year
+        self.form = form 

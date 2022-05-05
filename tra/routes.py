@@ -1,8 +1,8 @@
 import secrets
 from tra import db, app
-from tra.helpers import admin_set, check_admin_key
 from tra.models import ScoutResponse, Scout, Admin
-from flask import redirect, request, session, render_template, flash, escape, url_for, abort
+from tra.helpers import admin_set, check_admin_key, sanitize
+from flask import redirect, request, session, render_template, flash, escape, url_for, abort, Response
 
 
 @app.route("/")
@@ -54,7 +54,7 @@ def admin_login():
         # dont allow usernames longer than 20 characters
         if len(request.form["username"]) > 20:
             flash(f"Username cannot be more than 20 characters. Your username is {len(request.form['username'])} characters long")
-            return redirect(url_for('admin_login'))
+            return redirect(url_for("admin_login"))
 
         # admin account still needs to be set
         if not admin_set():
@@ -76,7 +76,7 @@ def admin_login():
             return redirect(url_for("admin_page"))
 
         flash("Invalid Admin Login Credentials", "is-danger")
-        return redirect(url_for('admin_login')) 
+        return redirect(url_for("admin_login"))
 
     # if no admin exists, then show the admin setup page
     if not admin_set():
@@ -96,7 +96,7 @@ def admin_page():
     admin = Admin.query.all()[0]
     if not check_admin_key(admin, session):
             abort(403)
-    return render_template("admin.html", admin=admin, scouts=Scout.query.all())
+    return render_template("admin.html", admin=admin, scouts=reversed(Scout.query.all()))
 
 @app.route("/logout")
 def logout():
@@ -112,17 +112,33 @@ def new_scout():
         abort(403)
     if "name" not in request.form or "code" not in request.form:
         abort(400)
+    
+    form = sanitize(request.form)
     scout_names = [scout.name for scout in Scout.query.all()]
-    if escape(request.form["name"]) in scout_names:
-        return {
-            "error" : f"P{request.form['name']} is already a scout"
-        }
-    scout = Scout(escape(request.form["name"]), request.form["code"])
+    if form["name"] in scout_names:
+        flash(f"{form['name']} is already a scout", "is-danger")
+        return Response(status=409)
+
+    scout = Scout(form["name"], form["code"])
     db.session.add(scout)
     db.session.commit()
-    return {"name" : scout.name}
-    
-    
+    flash(f"{scout.name} added successfully", "is-success")
+    return Response(status=200)
+
+@app.route("/admin/scout/delete/<id>", methods=["DELETE"])
+def delete_scout(id):
+    admin = Admin.query.all()[0]
+    if not check_admin_key(admin, session):
+        abort(403)
+    # this is the query object which can be deleted wiht db.session.delete()
+    scout = Scout.query.filter_by(id=int(id))
+    if scout is None:
+        abort(404)
+                # get the scout obejct from the query
+    flash(f"{scout.first().name} has been deleted", "is-primary")
+    scout.delete()
+    db.session.commit()
+    return Response(status=200form.namegtform.namegtgg)
 
 # This route is for testing writing to sql database
 @app.route("/test", methods=["POST", "GET"])  # specify methods and route
