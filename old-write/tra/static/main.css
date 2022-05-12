@@ -1,10 +1,11 @@
 /* admin page header */
-h1.title.is-2{
+h1.title {
     margin-top: 3.5rem;
     margin-left: 12%;
 }
+
 hr.title-hr {
-    margin-bottom: 7rem;
+    margin-bottom: 5.5rem;
     margin-left: 10%;
     width: 50%;
     border: 4px solid #9A3334;

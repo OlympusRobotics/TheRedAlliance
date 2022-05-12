@@ -66,9 +66,14 @@
     <div class="container">
         <div class="columns is-centered">
             <div class="column">
+                <div class="form-card is-flex is-justify-content-center">
+                    <div>
+                        <a class="button is-primary is-large" href="{{ url_for('create_form') }}">Create New Form +</a>
+                    </div>
+                </div>
                 {% for form in forms %}
                    <div class="form-card">
-                        <div class="is-flex is-justify-content-center">
+                        <div style="align-items: center;">
                             {{ form.name }}
                         </div>
                    </div> 

@@ -138,7 +138,11 @@ def delete_scout(id):
     flash(f"{scout.first().name} has been deleted", "is-primary")
     scout.delete()
     db.session.commit()
-    return Response(status=200form.namegtform.namegtgg)
+    return Response(status=200)
+
+@app.route("/admin/createform")
+def create_form():
+    return render_template("create_form.html", session=session) 
 
 # This route is for testing writing to sql database
 @app.route("/test", methods=["POST", "GET"])  # specify methods and route

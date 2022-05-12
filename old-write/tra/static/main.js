@@ -77,3 +77,10 @@ if (window.location.pathname == "/admin") {
     });
 }
     
+// custom form creation code
+if (window.location.pathname == "/admin/createform") {
+    var questions = [];
+    $("#add-question").on("click", function () {
+        $()
+    });
+}

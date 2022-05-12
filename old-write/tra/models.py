@@ -51,22 +51,23 @@ class Form(db.Model):
         # create FormQuestion model for each question in the form
         self.questions = map(FormQuestion, questions)
 
+# This is what is actually rendered into HTML
 class FormQuestion(db.Model):
-    form_id = db.Column(db.Integer, db.ForeignKey("form._id"), primary_key=True)
-    question_type = db.Column(db.String(2000)) # the type of question e.i. radio button, check boxes, text input, etc
+    form_id = db.Column(db.Integer, db.ForeignKey("form.id"), primary_key=True)
+    question_type = db.Column(db.Text) # the type of question e.i. radio button, check boxes, text input, etc
     question_prompt = db.Column(db.String(200)) # the prompt for the question that will be shown 
+    stats = db.Column(db.Text) # this stores stats such as how many people answered a certain way
 
     def __init__(self, question):
         self.question_prompt = question["prompt"]
         self.question_type = question["type"]
 
 class ScoutResponse(db.Model):  # create table
-    form_id = db.Column(db.Integer, db.ForeignKey("form._id"), primary_key=True)
+    form_id = db.Column(db.Integer, db.ForeignKey("form.id"), primary_key=True)
     data = db.Column(db.String(1000000))  # json of the response provided by the scout
-    form = db.Column(db.String(24)) # the form that the response is for
     date = db.Column(db.DateTime)
 
-    def __init__(self, data, form):
+    def __init__(self, data):
         self.data = data
         self.date = datetime.datetime.now()
         self.form = form 
