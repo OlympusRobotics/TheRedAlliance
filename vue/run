@@ -1,0 +1,6 @@
+#! /bin/bash
+python3 -m pip install -r backend/requirments.txt
+cd frontend
+python3 -m ../backend/tra &
+npm run dev &
+wait
