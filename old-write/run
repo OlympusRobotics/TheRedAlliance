@@ -1,3 +1,0 @@
-#!/bin/bash
-pip install -r requirments.txt
-python3 -m tra

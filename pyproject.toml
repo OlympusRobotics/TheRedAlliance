@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "theredalliance"
+version = "0.1.0"
+description = "FRC scouting web app"
+authors = ["PhantomLel <aamohammed4556@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+Flask = "^2.2.1"
+Flask-SQLAlchemy = "^2.5.1"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
