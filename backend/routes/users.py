@@ -7,3 +7,11 @@ bp = Blueprint('user', __name__, url_prefix='/user')
 def create():
     pass
 
+@bp.route('/delete', methods=["delete"])
+def delete():
+    pass
+
+@bp.route('/getinfo')
+def getinfo():
+    pass
+
