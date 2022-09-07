@@ -5,4 +5,4 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///./db.db'
 db = SQLAlchemy(app)
 
-from backend import routes
+from . import routes

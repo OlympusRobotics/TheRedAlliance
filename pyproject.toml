@@ -6,7 +6,7 @@ authors = ["PhantomLel <aamohammed4556@gmail.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.8"
 Flask = "^2.2.1"
 Flask-SQLAlchemy = "^2.5.1"
 
