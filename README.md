@@ -2,11 +2,6 @@
 
 Localhost FRC scouting application that works over ethernet.
 
-## Devlopment
-
-Currently, I am rewriting the previous implementation in Vue and with Typescript.
-The old write is not fully complete either.
-
 ### Running
 
 - To run the package during developement, use `./run`

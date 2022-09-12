@@ -1,8 +1,0 @@
-// file for adding jquery intellisense to vscode
-{
-    "typeAcquisition": {
-        "include": [
-            "jquery"
-        ]
-    }
-}

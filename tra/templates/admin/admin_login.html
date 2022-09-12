@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="hero is-transparent is-halfheight ">
+  <div class="title hero-head" style="text-align: center; margin-top: 1.5rem; color:rgb(201, 81, 105);">
+    Admin Log In
+    <hr>
+  </div>
+  <div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+        <div class="notification {{ category }} is-light animate__animated animate__backInRight"
+          style="padding: 2rem; margin-top: 0px; margin-bottom: 0px;" role="alert">
+          <button class="delete"></button>
+          {{message}}
+        </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <div class="hero-body">
+    <div class="container animate__animated animate__fadeInUp">
+      <div class="columns is-centered">
+        <div class="column is-5-tablet is-4-desktop is-3-widescreen">
+          <form method="POST" action="" class="box">
+            <div class="field">
+              <label for="" class="label">Username</label>
+              <div class="control has-icons-left">
+                <input name="username" value="{{ request.form['username'] }}" type="name" placeholder="Jason Quang"
+                  class="input" required>
+                <span class="icon is-small is-left">
+                  <i class="fa fa-envelope"></i>
+                </span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="" class="label">Password</label>
+              <div class="control has-icons-left">
+                <input name="password" value="{{ request.form['password'] }}" type="password" placeholder="*******"
+                  class="input" required>
+                <span class="icon is-small is-left">
+                  <i class="fa fa-lock"></i>
+                </span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="" class="checkbox">
+                <input name="persist" type="checkbox">
+                Remember me
+              </label>
+            </div>
+            <div class="field">
+              <button class="button is-danger is-light">
+                Login
+              </button>
+            </div>
+            <a href="{{ url_for('admin.register') }}">Register an Admin Account</a>
+            <br>
+            <a href="{{ url_for('scouts.login') }}">Scout Login</a>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}

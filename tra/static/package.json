@@ -1,0 +1,16 @@
+{
+  "name": "tra",
+  "version": "1.0.0",
+  "description": "npm libraries for tra flask backend",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "alpinejs": "^3.10.3",
+    "bulma": "^0.9.4",
+    "jquery": "^3.6.1"
+  }
+}
