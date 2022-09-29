@@ -1,0 +1,26 @@
+{# shows all the user's forms #}
+<div class="container">
+    <div class="columns is-centered">
+        <div class="column">
+            <div class="form-card is-flex is-justify-content-center">
+                <div>
+                    <a class="button is-primary is-large" href="{{ url_for('admin.create_form') }}">Create New Form +</a>
+                </div>
+            </div>
+            {% for form in forms %}
+                <div class="form-card">
+                    <div style="align-items: center;">
+                        {{ form.name }}
+                    </div>
+                </div> 
+            {% endfor %}
+        </div>
+
+    </div>
+</div>
+
+<script>
+
+
+    
+</script>

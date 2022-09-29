@@ -3,33 +3,20 @@
 {% block content %}
 
 <div class="hero is-transparent is-halfheight ">
-  <div class="title hero-head" style="text-align: center; margin-top: 1.5rem; color:rgb(201, 81, 105);">
+  <div class="title hero-head" style="text-align: center; margin-top: 1.5rem; color:rgb(186, 24, 57);">
     Admin Setup 
     <hr>
   </div>
-  <div class="container">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-        <div class="notification {{ category }} is-light animate__animated animate__backInRight"
-          style="padding: 2rem; margin-top: 0px; margin-bottom: 0px;" role="alert">
-          <button class="delete"></button>
-          {{message}}
-        </div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-  </div>
-
+  {% include 'notification.html' %}
   <div class="hero-body">
     <div class="container animate__animated animate__fadeInUp">
       <div class="columns is-centered">
         <div class="column is-5-tablet is-4-desktop is-3-widescreen">
-          <form method="POST" action="" class="box">
+          <form x-data="registerForm()" method="POST" action="" class="box">
             <div class="field">
-              <label for="" class="label">Username</label>
+              <label for="" class="label">Email</label>
               <div class="control has-icons-left">
-                <input id="username" name="username" value="{{ request.form['username'] }}" type="name" placeholder="Jason Quang"
+                <input @blur="validateUsername" @input.debounce="validateUsername" x-model="username" id="username" name="username" type="name" placeholder="Jason Quang"
                   class="input" required>
                 <span class="icon is-small is-left">
                   <i class="fa fa-envelope"></i>
@@ -39,7 +26,7 @@
             <div class="field">
               <label for="" class="label">Password</label>
               <div class="control has-icons-left">
-                <input id="password" name="password" value="{{ request.form['password'] }}" type="password" placeholder="*******"
+                <input id="password" name="password" x-model="password" type="password" placeholder="*******"
                   class="input" required>
                 <span class="icon is-small is-left">
                   <i class="fa fa-lock"></i>
@@ -49,7 +36,7 @@
             <div class="field">
               <label for="" class="label">Confirm Password</label>
               <div class="control has-icons-left">
-                <input id="password-confirm" type="password" placeholder="*******"
+                <input @blur="validatePassword" @input.debounce.500ms="validatePassword" x-model="confPassword" id="password-confirm" type="password" placeholder="*******"
                   class="input" required>
                 <span class="icon is-small is-left">
                   <i class="fa fa-lock"></i>
@@ -63,17 +50,67 @@
               </label>
             </div>
             <div class="field">
-              <button class="button is-danger" disabled>
+              <button :disabled="!pwValidated || !unValidated " class="button is-danger" >
                 Set up
               </button>
             </div>
-            <span id="form-feedback"></span>
+            <span id="form-feedback" x-text="formFeedback"></span>
+            <br>
+            <a href="{{ url_for('admin.admin_login') }}">Already have an account?</a>
           </form>
         </div>
       </div>
     </div>
   </div>
 </div>
+<!---javascript for this component-->
+<script>
+  // sorry, i know its confusing because I changed halfway
+  // from using usernames to emails
+function registerForm() {
+    return {
+        password : '',
+        confPassword : '',
+        formFeedback : '',
+        username : '',
+        pwValidated : false, // turns true when validatePassword passes
+        unValidated : false,
+
+        validateUsername() {
+          // if its empty get rid of form feedback
+          if (this.username.trim() === "") {
+            this.formFeedback = "";
+            return;
+          }
+          fetch(`${window.location.origin}/api/admin/is_username_valid?username=${this.username}`)
+          .then(res => res.json())
+          .then(res => {
+            console.log(res)
+            this.formFeedback = res.valid;
+            if (res.valid === "") {
+              this.unValidated = true; //the UN is valid
+            }
+          });
+        },
+        validatePassword () {
+            if (this.password != this.confPassword) {
+                this.formFeedback = "Passwords do not match";
+                this.pwValidated= false;
+            }
+            else if (this.password.length < 6) {
+                this.formFeedback = "Password must be atleast 6 characters long";
+                this.pwValidated= false;
+            }
+            else {
+                this.formFeedback = "";
+                this.pwValidated= true;
+            }
+        }
+    }
+}
+
+</script>
+
 
 
 {% endblock %}

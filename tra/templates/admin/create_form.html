@@ -4,7 +4,7 @@
 <h1 class="title is-3">Create New Scouting Form</h1>
 <hr class="title-hr">
 
-<section class="box">
+<section x-data="formCreator()" x-cloak class="box">
     <div class="is-flex is-justify-content-center mb-4">
         <div class="field is-horizontal">
             <div class="field-label is-large">
@@ -25,17 +25,125 @@
             <div class="column">
                 <div id="questions">
                     <!-- This is where all the added questions will go -->
-                    <div class="box">
-                        
-                    </div>
+                    <!-- whenever questions changes, save it to localstorage -->
+                    <template 
+                    x-data
+                    x-init="$watch('questions', q=>saveQuestions())"
+                    x-for="question in questions">
+                        <!-- div just to hold child elements. Also scrolls down when created -->
+                        <div x-init="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})">
+                            <button @click="removeQuestion(question)" style="float: right;" class="delete is-medium"></button>
+                            <div class="box mt-5">
+                                <template 
+                                x-id="['text-input', 'question-prompt']"
+                                x-for="comp in question.components"
+                                >
+                                <!-- div required because template with x-for can only have one root element -->
+                                    <div>
+                                        <!--If it is a prompt-->
+                                        <template x-if="PropertyTypes.Prompt.equals(comp.type)">
+                                            {% include 'properties/prompt.html' %}
+                                        </template>
+                                        <!--If it is a textbox-->
+                                        <template x-if="PropertyTypes.TextBox.equals(comp.type)">
+                                            {% include 'properties/textbox.html' %}
+                                        </template>
+                                    </div>
+                               </template>
+                            </div>
+                        </div>
+                    </template>
                 </div>
             </div>
         </div>
-        <button id="add-question" class=" button is-info" style="width: 100%;">Add New Question</button>
-        <button class="button is-primary is-large mt-4" style="width: 100%;">Create Form</button>
 
     </div>
+<button 
+:disabled="!(questions.length <= 15)" 
+id="add-question" 
+@click="createQuestion()" 
+class=" button is-primary is-light mt-4" style="width: 100%;">
+Add New Question
+</button>
+<button @click="" class="button is-primary is-large mt-4" style="width: 100%;">Create Form</button>
+<button @click="reset">reset (for testing)</button>
 </section>
+<script>
+function formCreator() {
+    return {
+        questions : [],
+        init() {
+            // load from localstorage
+            if (localStorage.getItem("questions") != null) {
+                this.questions = JSON.parse(localStorage.getItem("questions"));
+            }
+        },
+        createForm() {
+            
+        },
+
+        createQuestion() {
+            this.questions.push(
+                formQuestion(QuestionTypes.TextBox)
+            );
+        },
+        removeQuestion(question) {
+            this.questions = this.questions.filter(
+                q => q != question // filter out the question that is specified to delete
+            );
+        },
+        // just saves to localstorage. 
+        saveQuestions() {
+            localStorage.setItem("questions", JSON.stringify(this.questions));
+        },
+        // for testing rn
+        reset() {
+            this.questions = [];
+        },
+    }
+}
+// object for storing each question's data
+function formQuestion(questionType) {
+    return {
+        // random id. Does not need to be terribly unique
+        id : (Math.random() + 1).toString(36).substring(2),
+        type : questionType,
+        // defined in main.js
+        components : getDefaultComponents(questionType),
+        // create the basic components list
+    }
+}
+
+// returns a questionComponent TEMPLATE
+function questionComponent(type) {
+    var defaultComponents = {
+        edit : false,
+        type : type,
+    };
+    // make sure it is a valid type
+    if (PropertyTypes.templates.has(type.toString())) {
+        // copy all the template properties to the default properties
+        return Object.assign(
+                defaultComponents, 
+                PropertyTypes.templates.get(type.toString())
+            );
+    }
+}
+
+function getDefaultComponents(type) {
+  var out = [];
+  // this is probably not the best way to do it but im stupid so...
+  // check the question type then return the appropriate property templates
+  if (QuestionTypes.TextBox.equals(type)) {
+      out.push(questionComponent(PropertyTypes.Prompt));
+      out.push(questionComponent(PropertyTypes.TextBox));
+  }
+  else {
+      console.log("Bruh what kind of question is this? " + type);
+  }
+  return out;
+}
+</script>
 
 {% endblock %}
 

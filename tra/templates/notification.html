@@ -1,0 +1,27 @@
+{# Notification component #}
+<div class="container">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+      <div x-data="notification()" x-show="!deleted" @animationend="animationEnded" :class="{ 'animate__backOutLeft' : initialized }" class="notification {{ category }} is-light animate__animated animate__backInRight"
+        style="padding: 2rem; margin-top: 0px; margin-bottom: 0px;" role="alert">
+        <button @click="initialized = true"  class="delete"></button>
+        {{message}}
+      </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+</div>
+<script>
+function notification() {
+  return {
+    deleted : false,
+    initialized : false,
+    animationEnded() {
+      if (this.initialized) {
+        this.deleted = true;
+      }
+    }
+  }
+}
+</script>
