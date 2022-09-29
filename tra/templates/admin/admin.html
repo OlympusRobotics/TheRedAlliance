@@ -5,89 +5,45 @@
 <h1 class="title is-2">Admin Dashboard</h1>
 <hr class="title-hr">
 <div class="container mb-4">
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    {% for category, message in messages %}
-    <div class="notification {{ category }} is-light animate__animated animate__backInRight"
-      style="padding: 2rem; margin-top: 0px; margin-bottom: 0px;" role="alert">
-      <button class="delete"></button>
-      {{message}}
-    </div>
-    {% endfor %}
-  {% endif %}
-{% endwith %}
+    {% include 'notification.html'%}
 </div>
-<div id="dash-tabs" class="container">
-    <div class="tabs is-large is-boxed">
-        <ul>
-            <!--The onload is to add data to each tab allowing access to it in main.js-->
-            <li id="scouts" class="is-active"><a>Scouts</a></li>
-            <li id="forms"><a>Forms</a></li>
-            <li id="data"><a>Data</a></li>
-            <li id="settings"><a>Settings</a></li>
-        </ul>
-    </div>
+<div x-data="tabsManager()"> 
+    <div id="dash-tabs" class="container">
+        <div class="tabs is-large">
+            <ul>
+                <li @click="show(0)" id="forms" :class="{ 'is-active' : states[0] }"><a>Forms</a></li>
+                <li @click="show(1)" id="data":class="{ 'is-active' : states[1] }"><a>Data</a></li>
+                <li @click="show(2)" id="settings" :class="{ 'is-active' : states[2] }"><a>Settings</a></li>
+            </ul>
+        </div>
 
+    </div>
+    <!--
+        By having a manager, all the tabs can interact and share data easily. 
+        Sub-components also can access this data if needed so globals should be kept here
+    -->
+    <section x-show="states[0]" id="forms-tab">
+        {% include 'admin/forms_tab.html' %}
+    </section>
+    <section x-show="states[1]" id="data-tab">
+        Data
+    </section>
+    <section x-show="states[2]" id="settings-tab">
+        Settings
+    </section>
 </div>
-
-<section id="scouts-tab">
-    <div class="container">
-        <div class="columns">
-            <div class="column">
-                <div class="add-scout-panel ">
-                    <input id="new-name" name="name" class="input is-primary" type="text" placeholder="Scout Name">
-                    <input id="new-code" name="code" class="input is-primary" type="password" placeholder="Scout Code">
-                    <div class="is-flex is-justify-content-right">
-                        <button id="create-new" class="button is-primary" disabled>+ New Scout</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div id="scout-cards" class="columns is-centered">
-            <div class="column">
-                {% for scout in scouts %}
-                    <div class="scout-card">
-                        <span class="name">{{ scout.name }}</span>
-                        <div class="is-flex is-justify-content-right">
-                            <a class="button is-info">View Responses</a>
-                            <!--This is a false error. It does actually properly format-->
-                            <a onclick="deleteScout({{ scout.id }})" class="button is-danger">Delete</a>
-                        </div>
-                    </div>
-                {% else %}
-                    No scouts
-                {% endfor %}
-
-            </div>
-        </div>
-    </div>
-</section>
-<section id="forms-tab">
-    <div class="container">
-        <div class="columns is-centered">
-            <div class="column">
-                <div class="form-card is-flex is-justify-content-center">
-                    <div>
-                        <a class="button is-primary is-large" href="{{ url_for('admin.create_form') }}">Create New Form +</a>
-                    </div>
-                </div>
-                {% for form in forms %}
-                   <div class="form-card">
-                        <div style="align-items: center;">
-                            {{ form.name }}
-                        </div>
-                   </div> 
-                {% endfor %}
-            </div>
-
-        </div>
-    </div>
-</section>
-<section id="data-tab">
-    Data
-</section>
-<section id="settings-tab">
-    Settings
-</section>
-
+<script>
+function tabsManager() {
+    return {
+        states : new Array(3).fill(false), // fill the array with false.
+        init() {
+            this.show(0); //show the form tab when page loads
+        },
+        show(tabNumber) {
+            this.states.fill(false); // hide all the tabs
+            this.states[tabNumber] = true;
+        }
+    }
+}
+</script>
 {% endblock %}

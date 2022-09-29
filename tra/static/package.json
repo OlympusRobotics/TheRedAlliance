@@ -9,8 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "alpinejs": "^3.10.3",
-    "bulma": "^0.9.4",
-    "jquery": "^3.6.1"
+    "bulma": "^0.9.4"
   }
 }

@@ -7,19 +7,7 @@
     Admin Log In
     <hr>
   </div>
-  <div class="container">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-        <div class="notification {{ category }} is-light animate__animated animate__backInRight"
-          style="padding: 2rem; margin-top: 0px; margin-bottom: 0px;" role="alert">
-          <button class="delete"></button>
-          {{message}}
-        </div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-  </div>
+  {% include 'notification.html' %}
 
   <div class="hero-body">
     <div class="container animate__animated animate__fadeInUp">
@@ -57,9 +45,7 @@
                 Login
               </button>
             </div>
-            <a href="{{ url_for('admin.register') }}">Register an Admin Account</a>
-            <br>
-            <a href="{{ url_for('scouts.login') }}">Scout Login</a>
+            <a href="{{ url_for('admin.register') }}">Sign Up to Start Scouting</a>
           </form>
         </div>
       </div>

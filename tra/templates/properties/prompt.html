@@ -1,0 +1,25 @@
+<!-- question and comp object needs to be passed with alpine  -->
+<div>
+    <!-- the label is inveresly bound to the input.  -->
+    <label 
+    x-transition.100ms
+    x-text="comp.text"
+    x-show="!comp.edit" 
+    class="label is-medium" 
+    :for="$id('question-prompt')" 
+    @click="comp.edit = true"
+    >
+    </label>
+    <input
+    x-transition.200ms
+    type="text"
+    :id="$id('question-prompt')"
+    x-show="comp.edit"
+    x-model="comp.text"
+    placeholder="Enter a prompt for your amazing question"
+    class="input"
+    @blur="comp.text.length > 0 ? comp.edit = false : comp.edit = true"
+    @keyup.enter="comp.text.length > 0 ? comp.edit = false : comp.edit = true"
+    >
+
+</div>
