@@ -15,7 +15,7 @@ Scouts then sumbit ScoutResponses to them.
 
 class Admin(db.Model):
     id = db.Column("id", db.Integer, primary_key=True)  # pk
-    username = db.Column(db.String(64), unique=True, nullable=False)
+    username = db.Column(db.String(64), unique=True, nullable=False) # actually is email lol
     password = db.Column(
         db.String(120), nullable=False
     )  # code used for accessing account
@@ -34,36 +34,22 @@ class Form(db.Model):
     id = db.Column("id", db.Integer, primary_key=True)  # pk
     code = db.Column(db.String(6), unique=True, nullable=False)  # the url of the form
     name = db.Column(db.String(64), unique=True, nullable=False)
+    json_repr = db.Column(db.Text, nullable=False) # the full json representation of the form 
     admin_id = db.Column(db.Integer, db.ForeignKey("admin.id"), nullable=False)
     questions = db.relationship("FormQuestion", backref="form", lazy=True)
 
-    def __init__(self, name, questions):
+    def __init__(self, code, name, json_repr):
         self.name = name
-        self.code = "".join(
-            [random.choice(string.ascii_letters) for _ in range(6)]
-        ).upper()  # create 5 digit code
+        self.code = code
         # create FormQuestion model for each question in the form
-        self.questions = questions
-
+        self.json_repr = json_repr
 
 class FormQuestion(db.Model):
     id = db.Column("id", db.Integer, primary_key=True)  # pk
-    prompt = db.Column(db.String(200), nullable=True)
-    question_format = db.Column(db.Text, nullable=False)
-    responses = db.relationship("QuestionResponse", backref="question", lazy=True)
     form_id = db.Column(db.Integer, db.ForeignKey("form.id"), nullable=False)
+    data = db.Column(db.Text, nullable=False) # json object that contains format
+    responses = db.Column(db.Text, nullable=True) # json list of objects
 
-    def __init__(self, prompt, question_format):
-        self.prompt = prompt
-        self.question_format = question_format
+    def __init__(self, question_format):
+        self.data = question_format
 
-
-class QuestionResponse(db.Model):
-    id = db.Column("id", db.Integer, primary_key=True)  # pk
-    response = db.Column(db.Text, nullable=True)
-    question_id = db.Column(
-        db.Integer, db.ForeignKey("form_question.id"), nullable=False
-    )
-
-    def __init__(self, response):
-        self.response = response

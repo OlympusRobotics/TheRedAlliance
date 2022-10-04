@@ -7,13 +7,12 @@
                     <a class="button is-primary is-large" href="{{ url_for('admin.create_form') }}">Create New Form +</a>
                 </div>
             </div>
-            {% for form in forms %}
+            <template>
                 <div class="form-card">
                     <div style="align-items: center;">
-                        {{ form.name }}
                     </div>
                 </div> 
-            {% endfor %}
+            </template>
         </div>
 
     </div>

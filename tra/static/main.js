@@ -3,6 +3,9 @@ class Enum {
   constructor(name) {
     this.name = name;
   }
+  /**  
+  * @param {Object} a - Object containing name property 
+  */
   equals(a) {
     return this.name === a.name;
   }
@@ -32,7 +35,7 @@ class PropertyTypes extends Enum {
     [
       PropertyTypes.TextBox.toString(),
       {
-        placeholder: "",
+        placeholder: "Respond to the question",
       },
     ],
   ]);

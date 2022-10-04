@@ -16,7 +16,7 @@
             <div class="field">
               <label for="" class="label">Email</label>
               <div class="control has-icons-left">
-                <input @blur="validateUsername" @input.debounce="validateUsername" x-model="username" id="username" name="username" type="name" placeholder="Jason Quang"
+                <input @blur="validateUsername" @input.debounce.750ms="validateUsername" x-model="username" id="username" name="username" type="name" placeholder="Jason Quang"
                   class="input" required>
                 <span class="icon is-small is-left">
                   <i class="fa fa-envelope"></i>

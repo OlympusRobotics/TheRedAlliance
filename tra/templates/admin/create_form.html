@@ -31,7 +31,7 @@
                     x-init="$watch('questions', q=>saveQuestions())"
                     x-for="question in questions">
                         <!-- div just to hold child elements. Also scrolls down when created -->
-                        <div x-init="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})">
+                        <div x-init="$nextTick(() => {window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})})">
                             <button @click="removeQuestion(question)" style="float: right;" class="delete is-medium"></button>
                             <div class="box mt-5">
                                 <template 
@@ -65,12 +65,14 @@ id="add-question"
 class=" button is-primary is-light mt-4" style="width: 100%;">
 Add New Question
 </button>
-<button @click="" class="button is-primary is-large mt-4" style="width: 100%;">Create Form</button>
+<button :disabled="questions.length <= 0" @click="" class="button is-primary is-large mt-4" style="width: 100%;">Create Form</button>
 <button @click="reset">reset (for testing)</button>
 </section>
 <script>
 function formCreator() {
     return {
+        id : (Math.random() + 1).toString(36).substring(2),
+        draft : true, // stores if the form is complete or not
         questions : [],
         init() {
             // load from localstorage
@@ -78,19 +80,36 @@ function formCreator() {
                 this.questions = JSON.parse(localStorage.getItem("questions"));
             }
         },
+        // Submit Method
         createForm() {
-            
         },
-
         createQuestion() {
             this.questions.push(
                 formQuestion(QuestionTypes.TextBox)
             );
         },
         removeQuestion(question) {
-            this.questions = this.questions.filter(
-                q => q != question // filter out the question that is specified to delete
-            );
+            creator = this;
+            // create the alert modal
+            Bulma().alert({ 
+                    type: 'danger',
+                    title: "Delete Question?",
+                    body: "Are you sure you would like to delete this question? This action cannot be undone",
+                    confirm: {
+                        label: "Delete",
+                        classes : ['is-outlined'],
+                        onClick : (() => {
+                            creator.questions = creator.questions.filter(
+                                q => q != question // filter out the question that is specified to delete
+                            );
+                        })
+                    },
+                    cancel: {
+                        label : "Go Back",
+                        classes : ['is-outlined', 'is-success'],
+                    },
+                }
+            )
         },
         // just saves to localstorage. 
         saveQuestions() {
@@ -110,7 +129,6 @@ function formQuestion(questionType) {
         type : questionType,
         // defined in main.js
         components : getDefaultComponents(questionType),
-        // create the basic components list
     }
 }
 

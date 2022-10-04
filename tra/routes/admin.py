@@ -1,6 +1,6 @@
 import secrets
 from tra import db
-from tra.models import Admin
+from tra.models import Admin, Form, FormQuestion
 from .api import validate_username
 from tra.helpers import authorized, sanitize, set_key
 from flask import (
@@ -12,7 +12,6 @@ from flask import (
     escape,
     url_for,
     abort,
-    Response,
     Blueprint,
 )
 
@@ -70,10 +69,15 @@ def register():
     return render_template("admin/admin_setup.html")
 
 
-@bp.route("/admin/createform")
+@bp.route("/admin/createform", methods=["POST", "GET"])
 def create_form():
     admin = authorized(session)
-    return render_template("admin/create_form.html", admin=admin)
+    if request.method == "GET":
+        return render_template("admin/create_form.html", admin=admin)
+    
+    # if request.method == "POST":
+    req = request.json()
+    form = Form(req[""])
 
 
 # if whoever is unauthorized, redirect them to the login page
