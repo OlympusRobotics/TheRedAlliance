@@ -72,9 +72,10 @@ def register():
 @bp.route("/admin/createform", methods=["POST", "GET"])
 def create_form():
     admin = authorized(session)
+    admin.form.append()
     if request.method == "GET":
         return render_template("admin/create_form.html", admin=admin)
-    
+
     # if request.method == "POST":
     req = request.json()
     form = Form(req[""])

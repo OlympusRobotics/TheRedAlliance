@@ -20,7 +20,3 @@ app.register_blueprint(main_routes)
 app.register_blueprint(api_routes)
 
 
-def main():
-    db.create_all()
-    app.debug = True
-    app.run(host="127.0.0.1", port=5000)
