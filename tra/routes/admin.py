@@ -65,6 +65,10 @@ def register():
         set_key(admin, session, db)
         flash("Account created", "is-success")
         return redirect(url_for("admin.admin_page"))
+    
+    if len(Admin.query.all()) == 0:
+        db.session.add(Admin("a", "a"))
+        db.session.commit()
 
     return render_template("admin/admin_setup.html")
 

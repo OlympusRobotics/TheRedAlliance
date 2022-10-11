@@ -18,5 +18,9 @@ from .routes.api import bp as api_routes
 app.register_blueprint(admin_routes)
 app.register_blueprint(main_routes)
 app.register_blueprint(api_routes)
+app.app_context().push()
 
-
+def main():
+    db.create_all()
+    app.debug = True
+    app.run(host="127.0.0.1", port=5000)
