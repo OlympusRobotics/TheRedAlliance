@@ -2,7 +2,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=550, initial-scale=1">
     {% if title %}
         <title>{{title}} - The Red Alliance</title>
     {% else %}
@@ -13,6 +13,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/bulma/css/bulma.css')}}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz@20..48" />
+    
     <!--Alpine JS-->
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <!-- Bulma js plugins  -->
@@ -21,5 +24,12 @@
 
     <!--Main js file-->
     <script src="{{ url_for('static', filename='main.js') }}"></script>
+    <script>
+        // min sitewidth
+        var siteWidth = 550;
+        var scale = screen.width /siteWidth;
+        // set initial scale dynamiclly
+        document.querySelector('meta[name="viewport"]').setAttribute('content', 'width='+siteWidth+', initial-scale='+scale+'');
+    </script>
 </head>
 

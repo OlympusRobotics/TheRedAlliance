@@ -41,6 +41,31 @@ class PropertyTypes extends Enum {
   ]);
 }
 
+// creates a notification
+function notify(msg, cat) {
+  window.dispatchEvent(
+        // notify what went wrong
+        new CustomEvent('notify', 
+        {
+            detail : {
+                msg : msg,
+                category : cat
+                }   
+            }
+        )
+  );
+}
+
+// checks if the request is ok then converts to json
+async function checkOk(res) {
+    if (!res.ok) {
+      res = await res.json()
+      notify(res.error, "is-danger");
+      throw Error("Something went wrong");
+    }
+    return await res.json() 
+}
+
 // ---------- Straight from Bulma website https://bulma.io/documentation/components/navbar/
 // controls the navbar burger
 document.addEventListener("DOMContentLoaded", () => {

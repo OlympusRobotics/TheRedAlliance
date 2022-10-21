@@ -1,22 +1,51 @@
-{# Notification component #}
+{# 
+  Notification component
+  It handles both flask 'flashing' plus adds interface to dynamiclly create then using 'createNotification()'
+#}
 <div class="container">
+  <!--Alpine js notifications-->
+  <div x-data="notifyHandler()" @notify.window="addNotification($event)">
+    <template x-for="noti in notifications">
+      <div @animationend="remove(noti)" :class="{ [noti.cat] : true, 'animate__backOutLeft' : noti.initialized }" class="notification is-light animate__animated animate__backInRight"
+        style="padding: 2rem; margin-top: 0px; margin-bottom: 0px;" role="alert">
+        <button @click="noti.initialized = true"  class="delete"></button>
+        <span x-text="noti.msg"></span>
+      </div>      
+    </template>
+  </div>
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
       {% for category, message in messages %}
-      <div x-data="notification()" x-show="!deleted" @animationend="animationEnded" :class="{ 'animate__backOutLeft' : initialized }" class="notification {{ category }} is-light animate__animated animate__backInRight"
-        style="padding: 2rem; margin-top: 0px; margin-bottom: 0px;" role="alert">
-        <button @click="initialized = true"  class="delete"></button>
-        {{message}}
-      </div>
+        <notify x-data x-init="$dispatch('notify', { msg : '{{message}}', category : '{{category}}' })"></notify>
       {% endfor %}
     {% endif %}
   {% endwith %}
+
 </div>
 <script>
-function notification() {
+
+function notifyHandler() {
   return {
-    deleted : false,
+    notifications : [],
+    // takes in a 'notify' event with params 'msg' and 'category'
+    addNotification(e) {
+      this.notifications.push(
+        notification(e.detail.msg, e.detail.category)
+      );
+    },
+    remove(noti) {
+      // if it is just being called on the first animation event dont do anything
+      if (!noti.initialized) return null;
+      console.log("wuaww")
+      this.notifications = this.notifications.filter((a) => a != noti)
+    }
+  }
+}
+function notification(msg, category) {
+  return {
     initialized : false,
+    msg : msg, // msg and cat are only needed for dynamic notifications
+    cat : category,
     animationEnded() {
       if (this.initialized) {
         this.deleted = true;

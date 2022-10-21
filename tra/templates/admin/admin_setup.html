@@ -83,9 +83,8 @@ function registerForm() {
             return;
           }
           fetch(`${window.location.origin}/api/admin/is_username_valid?username=${this.username}`)
-          .then(res => res.json())
+          .then(res => checkOk(res))
           .then(res => {
-            console.log(res)
             this.formFeedback = res.valid;
             if (res.valid === "") {
               this.unValidated = true; //the UN is valid

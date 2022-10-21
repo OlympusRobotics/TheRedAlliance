@@ -6,7 +6,7 @@ echo "NPM packages installed"
 if [ ! -d "bulmajs" ]; then
     echo "Installing BulmaJs"
     wget https://github.com/VizuaaLOG/BulmaJS/archive/refs/tags/0.12.2.zip -O bulmajs.zip
-    unzip bulmajs.zip --quiet
+    unzip bulmajs.zip
     mv BulmaJS-0.12.2 bulmajs
     rm bulmajs.zip
     echo "Installed"

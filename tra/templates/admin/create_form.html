@@ -62,14 +62,14 @@
 :disabled="!(questions.length <= 15)" 
 id="add-question" 
 @click="createQuestion()" 
-class=" button is-primary is-light mt-4" style="width: 100%;">
+class=" button is-primary is-medium mt-4" style="width: 100%;">
 Add New Question
 </button>
-<button :disabled="questions.length <= 0" @click="" class="button is-primary is-large mt-4" style="width: 100%;">Create Form</button>
 <button @click="reset">reset (for testing)</button>
 </section>
 <script>
 function formCreator() {
+    
     return {
         id : (Math.random() + 1).toString(36).substring(2),
         draft : true, // stores if the form is complete or not

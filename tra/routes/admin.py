@@ -1,3 +1,5 @@
+"These routes are HTML responses ONLY"
+
 import secrets
 from tra import db
 from tra.models import Admin, Form, FormQuestion
@@ -48,6 +50,9 @@ def admin_login():
 
         flash("Invalid Admin Login Credentials", "is-danger")
         return redirect(url_for("admin.admin_login"))
+    if len(Admin.query.all()) == 0:
+        db.session.add(Admin(username="a", password="a"))
+        db.session.commit()
     return render_template("admin/admin_login.html")
 
 
@@ -58,37 +63,33 @@ def register():
         # client already checks username. Abort if the username is not valid.
         if validate_username(request.form["username"])["valid"] != "":
             abort(400)
-        admin = Admin(request.form["username"], request.form["password"])
+        admin = Admin(
+            username=request.form["username"], password=request.form["password"]
+        )
         db.session.add(admin)
         db.session.commit()
         # log the user in
         set_key(admin, session, db)
         flash("Account created", "is-success")
         return redirect(url_for("admin.admin_page"))
-    
-    if len(Admin.query.all()) == 0:
-        db.session.add(Admin("a", "a"))
-        db.session.commit()
 
     return render_template("admin/admin_setup.html")
 
 
-@bp.route("/admin/createform", methods=["POST", "GET"])
-def create_form():
+@bp.route("/editform", methods=["POST", "GET"])
+def edit_form():
     admin = authorized(session)
-    admin.form.append()
+    # get the form and make sure it belongs to the right person
+    # This is def not optimized TODO fix this
+    form = Form.query.filter_by(
+        code=request.args["code"], admin_id=admin.id
+    ).first_or_404()
     if request.method == "GET":
-        return render_template("admin/create_form.html", admin=admin)
-
-    # if request.method == "POST":
-    req = request.json()
-    form = Form(req[""])
+        return render_template("admin/create_form.html")
 
 
 # if whoever is unauthorized, redirect them to the login page
+# this obviously only needs to be on this route
 @bp.errorhandler(403)
 def unauthorized(a):
     return redirect(url_for("admin.admin_login"))
-
-
-bp.register_error_handler(403, unauthorized)

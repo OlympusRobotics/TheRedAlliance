@@ -23,29 +23,36 @@ hr.title-hr {
     max-width: 25em;
 }
 
-.scout-card {
+.form-card {
     display: flex;
     justify-content: space-between;
-    background-color: rgb(250, 250, 250);
+    background-color: rgb(243, 243, 243);
     padding: 1.5em;
     margin-bottom: 1.5em;
     border-radius: 10px;
     font-size: 1.2em;
-    transition: ease 0.1s; 
+    transition: ease 0.3s; 
 }
 
-.scout-card:hover {
-    zoom: 1.02; 
-    -moz-transform: scale(1.02);
+.form-card:hover {
+    border-radius: 20px;
+    -webkit-transform:scale(0.98);
+    -moz-transform:scale(0.98);
+    -ms-transform:scale(0.98);
+    transform:scale(0.98);
 }
 
-.scout-card .name{
+.form-card .name{
     font-size: larger;
     font-weight: bold;
 }
 
-.scout-card div {
+.form-card div {
     display: inline-block;
+}
+
+.form-card .material-symbols-outlined {
+        font-variation-settings: 'opsz' 20;
 }
 
 
@@ -75,22 +82,3 @@ hr.title-hr {
 .progress {
     width: 60rem !important;
 }
-
-.form-card {
-    display: flex;
-    justify-content: space-between;
-    background-color: rgb(250, 250, 250);
-    padding: 1.5em;
-    margin-bottom: 1.5em;
-    border-radius: 10px;
-    font-size: 1.2em;
-    transition: ease 0.1s; 
-}
-
-.form-card:hover {
-    zoom: 1.02; 
-    -moz-transform: scale(1.02);
-}
-
-
-  
