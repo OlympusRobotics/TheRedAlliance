@@ -4,7 +4,9 @@
 <h1 class="title is-3">Create New Scouting Form</h1>
 <hr class="title-hr">
 
-<section x-data="formCreator()" x-cloak class="box">
+<section x-init="$watch('form.', q=>form.saveForm())}"
+        x-data="formCreator()" 
+        class="box">
     <div class="is-flex is-justify-content-center mb-4">
         <div class="field is-horizontal">
             <div class="field-label is-large">
@@ -13,7 +15,7 @@
             <div class="field-body">
                 <div class="field">
                     <p class="control">
-                        <input class="input" type="text" placeholder="Title e.g. 2022 Rapid React">
+                        <input x-model="form.name" class="input" type="text" placeholder="Title e.g. 2022 Rapid React">
                     </p>
                 </div>
             </div>
@@ -28,11 +30,10 @@
                     <!-- whenever questions changes, save it to localstorage -->
                     <template 
                     x-data
-                    x-init="$watch('questions', q=>saveQuestions())"
-                    x-for="question in questions">
+                    x-for="question in form.questions">
                         <!-- div just to hold child elements. Also scrolls down when created -->
                         <div x-init="$nextTick(() => {window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})})">
-                            <button @click="removeQuestion(question)" style="float: right;" class="delete is-medium"></button>
+                            <button @click="form.removeQuestion(question)" style="float: right;" class="delete is-medium"></button>
                             <div class="box mt-5">
                                 <template 
                                 x-id="['text-input', 'question-prompt']"
@@ -59,73 +60,105 @@
 
     </div>
 <button 
-:disabled="!(questions.length <= 15)" 
+:disabled="!(form.questions.length <= 15)" 
 id="add-question" 
-@click="createQuestion()" 
+@click="form.createQuestion()" 
 class=" button is-primary is-medium mt-4" style="width: 100%;">
 Add New Question
 </button>
-<button @click="reset">reset (for testing)</button>
+<button @click="form.reset">reset (for testing)</button>
 </section>
 <script>
 function formCreator() {
-    
-    return {
-        id : (Math.random() + 1).toString(36).substring(2),
-        draft : true, // stores if the form is complete or not
-        questions : [],
+    return { 
+        // so that alpine calls this
         init() {
-            // load from localstorage
-            if (localStorage.getItem("questions") != null) {
-                this.questions = JSON.parse(localStorage.getItem("questions"));
-            }
+            this.form.init();
         },
-        // Submit Method
-        createForm() {
-        },
-        createQuestion() {
-            this.questions.push(
-                formQuestion(QuestionTypes.TextBox)
-            );
-        },
-        removeQuestion(question) {
-            creator = this;
-            // create the alert modal
-            Bulma().alert({ 
-                    type: 'danger',
-                    title: "Delete Question?",
-                    body: "Are you sure you would like to delete this question? This action cannot be undone",
-                    confirm: {
-                        label: "Delete",
-                        classes : ['is-outlined'],
-                        onClick : (() => {
-                            creator.questions = creator.questions.filter(
-                                q => q != question // filter out the question that is specified to delete
-                            );
-                        })
-                    },
-                    cancel: {
-                        label : "Go Back",
-                        classes : ['is-outlined', 'is-success'],
-                    },
+        // wrapper so that form can reference itself
+        form : {
+            code : "",
+            name : "",
+            draft : true, // stores if the form is complete or not
+            questions : [],
+            lastSaved : Date.now(),
+            initialized : false,
+            init() {
+                this.fetchForm();
+            },
+            fetchForm() {
+            // get the json repr and turn into alpine object
+                fetch("/api/getform/" + new URL(location.href).searchParams.get("code"))
+                .then(req => checkOk(req))
+                .then(req => {
+                    this.code = req.code;
+                    this.draft = req.draft;
+                    this.questions = req.questions;
+                    this.name = req.name;
+                })
+            },
+            createQuestion() {
+                this.questions.push(
+                    formQuestion(QuestionTypes.TextBox)
+                );
+            },
+            removeQuestion(question) {
+                // create the alert modal
+                Bulma().alert({ 
+                        type: 'danger',
+                        title: "Delete Question?",
+                        body: "Are you sure you would like to delete this question? This action cannot be undone",
+                        confirm: {
+                            label: "Delete",
+                            classes : ['is-outlined'],
+                            onClick : (() => {
+                                creator.questions = creator.questions.filter(
+                                    q => q != question // filter out the question that is specified to delete
+                                );
+                            })
+                        },
+                        cancel: {
+                            label : "Go Back",
+                            classes : ['is-outlined', 'is-success'],
+                        },
+                    }
+                )
+            },
+            saveForm() {
+                // dont save first time this function is called
+                // TODO: fix
+                if (!this.initialized) {
+                    this.initialized = true;
+                    return;
                 }
-            )
-        },
-        // just saves to localstorage. 
-        saveQuestions() {
-            localStorage.setItem("questions", JSON.stringify(this.questions));
-        },
-        // for testing rn
-        reset() {
-            this.questions = [];
-        },
+                console.log("saving")
+                fetch("/api/editform/" + this.code, {
+                    credentials : 'same-origin',
+                    method : "POST",
+                    headers : {
+                        'Content-Type' : 'application/json'
+                    },
+                    // for some reason JSON.stringify(this) is not working 
+                    body: JSON.stringify({
+                        code : this.code,
+                        name : this.name,
+                        draft : this.draft,
+                        questions : this.questions
+                    })
+                });
+            },
+            // for testing rn
+            reset() {
+                this.questions = [];
+            },
+        }
     }
 }
 // object for storing each question's data
 function formQuestion(questionType) {
     return {
         // random id. Does not need to be terribly unique
-        id : (Math.random() + 1).toString(36).substring(2),
+        code : (Math.random() + 1).toString(36).substring(2),
         type : questionType,
         // defined in main.js
         components : getDefaultComponents(questionType),

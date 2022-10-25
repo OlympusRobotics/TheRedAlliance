@@ -18,7 +18,7 @@ def create_form():
     JSON response
     """
     admin = authorized(session)
-    if len(admin.forms) >= 3:
+    if len(admin.forms) >= 100:
         abort(400, description="Form Limit Reached (100)")
 
     code = "".join(random.choice(string.ascii_letters) for _ in range(6))
@@ -35,7 +35,7 @@ def create_form():
     return {"msg": "Form Created", "code": form.code}
 
 
-@bp.route("/editform/<code>")
+@bp.route("/editform/<code>", methods=["POST"])
 def edit_form(code):
     """
     Update a form. Takes JSON repr of the form
@@ -57,10 +57,10 @@ def edit_form(code):
     """
     admin = authorized(session)
     form = Form.query.filter_by(admin_id=admin.id, code=code).first_or_404()
-    json_repr = request.get_json(force=True)
+    json_repr = request.json
     # validate and sanitize all the data
-    if len(json_repr["name"]) > 15:
-        abort(400, description="Form Title Too Long (15 max)")
+    if len(json_repr["name"]) > 40:
+        abort(400, description="Form Title Too Long (40 max)")
 
     if type(json_repr["draft"]) != bool:
         abort(400)
@@ -68,13 +68,14 @@ def edit_form(code):
     # TODO: make this not so stupid
     for q in form.questions:
         db.session.delete(q)
+    db.session.commit()
     # update database with new FormQuestion columns
     for q in json_repr["questions"]:
         db.session.add(FormQuestion(code=q["code"], form=form, data=json.dumps(q)))
 
+    form.json_repr = json.dumps(json_repr)
     form.draft = json_repr["draft"]
     form.name = json_repr["name"]
-
     db.session.commit()
     return {"status": 200}
 
@@ -85,21 +86,26 @@ def delete_form(code):
     admin = authorized(session)
     # filter for a form that has the same code and same admin id
     form = Form.query.filter_by(admin_id=admin.id, code=code).first_or_404()
+    # remove all the questions
+    for q in form.questions:
+        db.session.delete(q)
     db.session.delete(form)
     db.session.commit()
     return {"status": 200}
 
 
 @bp.route("/getform/<code>")
+@limiter.limit("1/second")
 def get_form_data(code):
     """Returns JSON repr of form"""
     admin = authorized(session)
     # filter for a form that has the same code and same admin id
     form = Form.query.filter_by(admin_id=admin.id, code=code).first_or_404()
-    return {"form": form.json_repr}
+    return form.json_repr
 
 
 @bp.route("/getforms", methods=["GET"])
+@limiter.limit("1/second")
 def get_forms():
     "Return list of form titles, codes, and draft state. Auth required"
     admin = authorized(session)

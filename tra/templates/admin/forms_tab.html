@@ -7,7 +7,7 @@
                     <a class="button is-primary is-large" @click="createForm()">Create New Form +</a>
                 </div>
             </div>
-            <template x-data="getForms()" x-for="form in forms" x-init="">
+            <template x-data="getForms()" x-for="form in forms">
                 <div class="form-card">
                     <span x-text="form.name" class="name"></span>
                     <br>
