@@ -21,7 +21,7 @@ class Admin(db.Model):
     forms = db.relationship("Form", backref="admin")
 
     def __repr__(self):
-        return f"Admin {self.username} | {self.password} | {self.code}"
+        return f"Admin {self.username} | {self.password} | {self.key}"
 
 
 class Form(db.Model):

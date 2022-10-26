@@ -47,12 +47,13 @@ hr.title-hr {
     font-weight: bold;
 }
 
-.form-card div {
-    display: inline-block;
-}
-
-.form-card .material-symbols-outlined {
-        font-variation-settings: 'opsz' 20;
+@media screen and (max-width: 800px) {
+    .form-card {
+        display: block;
+    }
+    .form-card .buttons {
+        margin-top: 1.3rem;
+    }
 }
 
 

@@ -11,7 +11,7 @@ if [ ! -d "bulmajs" ]; then
     rm bulmajs.zip
     echo "Installed"
 else
-    echo "BulmaJS already installed"
+    echo "BulmaJS already installed!!!!!!!!!!!!!!!!!!!!!!!!"
 fi
 cd  ../..
 pip install -r requirments.txt --quiet

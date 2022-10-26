@@ -9,14 +9,11 @@
             </div>
             <template x-data="getForms()" x-for="form in forms">
                 <div class="form-card">
-                    <span x-text="form.name" class="name"></span>
-                    <br>
-                    <div class="is-flex is-justify-content-right">
-                        <div class="buttons">
-                            <a :href="'/admin/editform?code=' + form.code"  class="button is-primary">Edit Form</a>
-                            <a class="button is-info">View Responses</a>
-                            <a @click="deleteForm(form.code)" class="button is-danger">Delete</a>
-                        </div>
+                    <div x-text="form.name" class="name"></div>
+                    <div class="buttons">
+                        <a :href="'/admin/editform?code=' + form.code"  class="button is-primary">Edit Form</a>
+                        <a class="button is-info">View Responses</a>
+                        <a @click="deleteForm(form.code)" class="button is-danger">Delete</a>
                     </div>
                 </div>
             </template>

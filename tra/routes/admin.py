@@ -78,14 +78,16 @@ def register():
 
 @bp.route("/editform", methods=["POST", "GET"])
 def edit_form():
-    admin = authorized(session)
+    admin = authorized(session, abort_on_fail=False)
+    # if not logged in, the user probably is trying to use the form
+    if admin is None:
+        return redirect(url_for("main.form", code=request.args["code"]))
     # get the form and make sure it belongs to the right person
     # This is def not optimized TODO fix this
     form = Form.query.filter_by(
         code=request.args["code"], admin_id=admin.id
     ).first_or_404()
-    if request.method == "GET":
-        return render_template("admin/create_form.html")
+    return render_template("admin/create_form.html")
 
 
 # if whoever is unauthorized, redirect them to the login page

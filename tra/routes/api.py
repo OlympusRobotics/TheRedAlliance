@@ -36,6 +36,7 @@ def create_form():
 
 
 @bp.route("/editform/<code>", methods=["POST"])
+@limiter.limit("3/second")
 def edit_form(code):
     """
     Update a form. Takes JSON repr of the form

@@ -4,7 +4,7 @@
 <h1 class="title is-3">Create New Scouting Form</h1>
 <hr class="title-hr">
 
-<section x-init="$watch('form.', q=>form.saveForm())}"
+<section x-init="$watch('data', q=>saveForm())"
         x-data="formCreator()" 
         class="box">
     <div class="is-flex is-justify-content-center mb-4">
@@ -15,12 +15,11 @@
             <div class="field-body">
                 <div class="field">
                     <p class="control">
-                        <input x-model="form.name" class="input" type="text" placeholder="Title e.g. 2022 Rapid React">
+                        <input maxlength="40" x-model="data.name" class="input" type="text" placeholder="Title e.g. 2022 Rapid React">
                     </p>
                 </div>
             </div>
     </div>
-    
     </div>
     <div class="container">
         <div class="columns is-centered">
@@ -30,10 +29,10 @@
                     <!-- whenever questions changes, save it to localstorage -->
                     <template 
                     x-data
-                    x-for="question in form.questions">
+                    x-for="question in data.questions">
                         <!-- div just to hold child elements. Also scrolls down when created -->
                         <div x-init="$nextTick(() => {window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})})">
-                            <button @click="form.removeQuestion(question)" style="float: right;" class="delete is-medium"></button>
+                            <button @click="removeQuestion(question)" style="float: right;" class="delete is-medium"></button>
                             <div class="box mt-5">
                                 <template 
                                 x-id="['text-input', 'question-prompt']"
@@ -60,98 +59,96 @@
 
     </div>
 <button 
-:disabled="!(form.questions.length <= 15)" 
+:disabled="!(data.questions.length <= 15)" 
 id="add-question" 
-@click="form.createQuestion()" 
+@click="createQuestion()" 
 class=" button is-primary is-medium mt-4" style="width: 100%;">
 Add New Question
 </button>
-<button @click="form.reset">reset (for testing)</button>
+<button @click="reset">reset (for testing)</button>
 </section>
 <script>
 function formCreator() {
-    return { 
-        // so that alpine calls this
-        init() {
-            this.form.init();
-        },
-        // wrapper so that form can reference itself
-        form : {
+    return {
+        // data that is saved to server
+        data : {
             code : "",
             name : "",
             draft : true, // stores if the form is complete or not
             questions : [],
-            lastSaved : Date.now(),
-            initialized : false,
-            init() {
-                this.fetchForm();
-            },
-            fetchForm() {
-            // get the json repr and turn into alpine object
-                fetch("/api/getform/" + new URL(location.href).searchParams.get("code"))
-                .then(req => checkOk(req))
-                .then(req => {
-                    this.code = req.code;
-                    this.draft = req.draft;
-                    this.questions = req.questions;
-                    this.name = req.name;
-                })
-            },
-            createQuestion() {
-                this.questions.push(
-                    formQuestion(QuestionTypes.TextBox)
-                );
-            },
-            removeQuestion(question) {
-                // create the alert modal
-                Bulma().alert({ 
-                        type: 'danger',
-                        title: "Delete Question?",
-                        body: "Are you sure you would like to delete this question? This action cannot be undone",
-                        confirm: {
-                            label: "Delete",
-                            classes : ['is-outlined'],
-                            onClick : (() => {
-                                creator.questions = creator.questions.filter(
-                                    q => q != question // filter out the question that is specified to delete
-                                );
-                            })
-                        },
-                        cancel: {
-                            label : "Go Back",
-                            classes : ['is-outlined', 'is-success'],
-                        },
-                    }
-                )
-            },
-            saveForm() {
-                // dont save first time this function is called
-                // TODO: fix
-                if (!this.initialized) {
-                    this.initialized = true;
-                    return;
-                }
-                console.log("saving")
-                fetch("/api/editform/" + this.code, {
-                    credentials : 'same-origin',
-                    method : "POST",
-                    headers : {
-                        'Content-Type' : 'application/json'
+            timer : null,
+        },
+        lastSaved : Date.now(),
+        initialized : false,
+        init() {
+            this.fetchForm();
+        },
+        fetchForm() {
+        // get the json repr and turn into alpine object
+            fetch("/api/getform/" + new URL(location.href).searchParams.get("code"))
+            .then(req => checkOk(req))
+            .then(req => {
+                this.data.code = req.code;
+                this.data.draft = req.draft;
+                this.data.questions = req.questions;
+                this.data.name = req.name;
+            })
+        },
+        createQuestion() {
+            this.data.questions.push(
+                formQuestion(QuestionTypes.TextBox)
+            );
+        },
+        removeQuestion(question) {
+            var data = this.data;
+            // create the alert modal
+            Bulma().alert({ 
+                    type: 'danger',
+                    title: "Delete Question?",
+                    body: "Are you sure you would like to delete this question? This action cannot be undone",
+                    confirm: {
+                        label: "Delete",
+                        classes : ['is-outlined'],
+                        onClick : (() => {
+                            data.questions = data.questions.filter(
+                                q => q != question // filter out the question that is specified to delete
+                            );
+                        })
                     },
-                    // for some reason JSON.stringify(this) is not working 
-                    body: JSON.stringify({
-                        code : this.code,
-                        name : this.name,
-                        draft : this.draft,
-                        questions : this.questions
-                    })
-                });
-            },
-            // for testing rn
-            reset() {
-                this.questions = [];
-            },
-        }
+                    cancel: {
+                        label : "Go Back",
+                        classes : ['is-outlined', 'is-success'],
+                    },
+                }
+            )
+        },
+        // wrapper to debounce the save function. 1 sec timeout
+        saveForm() {
+            clearTimeout(this.timer);
+            this.timer = setTimeout(() => { this._saveForm(); } , 250);
+        },
+        _saveForm() {
+            // dont save first time this function is called
+            // TODO: fix
+            if (!this.initialized) {
+                this.initialized = true;
+                return;
+            }
+            console.log("saving")
+            fetch("/api/editform/" + this.data.code, {
+                credentials : 'same-origin',
+                method : "POST",
+                headers : {
+                    'Content-Type' : 'application/json'
+                },
+                // only send the data that is needed by server
+                body: JSON.stringify(this.data)
+            });
+        },
+        // for testing rn
+        reset() {
+            this.questions = [];
+        },
     }
 }
 // object for storing each question's data
@@ -194,6 +191,7 @@ function getDefaultComponents(type) {
   }
   return out;
 }
+
 </script>
 
 {% endblock %}

@@ -1,4 +1,5 @@
 # Common routes such as home or logging out
+from ..models import Form
 from flask import (
     redirect,
     request,
@@ -17,6 +18,11 @@ bp = Blueprint("main", __name__)
 def home():
     return redirect(url_for("admin.admin_login"))
 
+@bp.route("/<code>")
+def form(code):
+    if Form.query.filter_by(code=code).first() is None:
+        return redirect(url_for("admin.admin_page"))
+    return render_template("public/form.html")
 
 @bp.route("/logout")
 def logout():
