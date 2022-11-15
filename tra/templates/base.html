@@ -24,8 +24,24 @@
                 </div>
             </div>
         </nav>
+        <div x-data="notificationHandler()" class="notification noti-content" @notify.window="updateNoti($event)" :class="{ [type] : true, 'animated' : animated }" >
+            <span x-text="text"></span>
+        </div>
         
     </header>
+    {# 
+    Notification component
+    It handles both flask 'flashing' plus adds interface to dynamiclly create then using 'createNotification()'
+    #}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+            <notify x-data x-init="notify({{message}}, {{category}})"></notify>
+        {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+
     {% block content %}{% endblock %}
 </div>
 </body>

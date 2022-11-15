@@ -20,8 +20,7 @@ def home():
 
 @bp.route("/<code>")
 def form(code):
-    if Form.query.filter_by(code=code).first() is None:
-        return redirect(url_for("admin.admin_page"))
+    Form.query.filter_by(code=code).first_or_404() 
     return render_template("public/form.html")
 
 @bp.route("/logout")

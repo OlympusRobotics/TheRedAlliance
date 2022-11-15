@@ -11,9 +11,12 @@
                 <div class="form-card">
                     <div x-text="form.name" class="name"></div>
                     <div class="buttons">
+                        <button @click="navigator.clipboard.writeText(location.origin + '/' + form.code)" title="Copy Form Link" class="button is-light">
+                            <i class="fa-solid fa-link"></i>
+                        </button>
                         <a :href="'/admin/editform?code=' + form.code"  class="button is-primary">Edit Form</a>
-                        <a class="button is-info">View Responses</a>
-                        <a @click="deleteForm(form.code)" class="button is-danger">Delete</a>
+                        <a class="button is-primary">View Responses</a>
+                        <a @click="deleteForm(form.code)" class="button is-outlined is-danger">Delete</a>
                     </div>
                 </div>
             </template>

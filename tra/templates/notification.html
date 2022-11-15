@@ -1,7 +1,3 @@
-{# 
-  Notification component
-  It handles both flask 'flashing' plus adds interface to dynamiclly create then using 'createNotification()'
-#}
 <div class="container">
   <!--Alpine js notifications-->
   <div x-data="notifyHandler()" @notify.window="addNotification($event)">

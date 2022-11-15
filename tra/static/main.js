@@ -41,6 +41,21 @@ class PropertyTypes extends Enum {
   ]);
 }
 
+function notificationHandler() {
+    return {
+        type: "is-success",
+        text: "test",
+        animated : false,
+        async updateNoti(e) {
+            this.type = e.detail.cat;
+            this.text = e.detail.msg;
+            this.animated = true;
+            await new Promise(r => setTimeout(r, 5000));
+            this.animated = false;
+        }
+    }
+}
+
 // creates a notification
 function notify(msg, cat) {
   window.dispatchEvent(

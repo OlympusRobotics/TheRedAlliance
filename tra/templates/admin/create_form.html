@@ -4,9 +4,20 @@
 <h1 class="title is-3">Create New Scouting Form</h1>
 <hr class="title-hr">
 
-<section x-init="$watch('data', q=>saveForm())"
-        x-data="formCreator()" 
-        class="box">
+<section x-data="formCreator()" 
+         class="box">
+    <div class="is-flex is-justify-content-center mb-4">
+        <span class="title is-6">
+            <div x-show="!saving" >
+                <i class="fa-solid fa-cloud"></i>
+                Saved
+            </div>
+            <div x-show="saving">
+                <i class="fa-solid fa-rotate"></i>
+                Saving
+            </div>
+        </span>
+    </div>
     <div class="is-flex is-justify-content-center mb-4">
         <div class="field is-horizontal">
             <div class="field-label is-large">
@@ -14,12 +25,10 @@
             </div>
             <div class="field-body">
                 <div class="field">
-                    <p class="control">
-                        <input maxlength="40" x-model="data.name" class="input" type="text" placeholder="Title e.g. 2022 Rapid React">
-                    </p>
+                    <input maxlength="40" x-model="data.name" class="input" type="text" placeholder="Title e.g. 2022 Rapid React">
                 </div>
             </div>
-    </div>
+        </div>
     </div>
     <div class="container">
         <div class="columns is-centered">
@@ -78,10 +87,23 @@ function formCreator() {
             questions : [],
             timer : null,
         },
+        saving : false,
         lastSaved : Date.now(),
         initialized : false,
         init() {
             this.fetchForm();
+            this.$watch('data', q=>this.saveForm());
+            // if the form is saving let the user know
+            this.$watch('saving', q=> {
+                if (this.saving) {
+                    window.onbeforeunload = (e) => {
+                        return "";
+                    }
+                }
+                else {
+                    window.onbeforeunload = () => {}; // remove event listener
+                }
+            })
         },
         fetchForm() {
         // get the json repr and turn into alpine object
@@ -124,16 +146,13 @@ function formCreator() {
         },
         // wrapper to debounce the save function. 1 sec timeout
         saveForm() {
+            this.saving = true;
             clearTimeout(this.timer);
-            this.timer = setTimeout(() => { this._saveForm(); } , 250);
+            this.timer = setTimeout(() => { this._saveForm(); } , 1000);
         },
         _saveForm() {
             // dont save first time this function is called
             // TODO: fix
-            if (!this.initialized) {
-                this.initialized = true;
-                return;
-            }
             console.log("saving")
             fetch("/api/editform/" + this.data.code, {
                 credentials : 'same-origin',
@@ -143,7 +162,8 @@ function formCreator() {
                 },
                 // only send the data that is needed by server
                 body: JSON.stringify(this.data)
-            });
+            })
+            .then(req => this.saving = false);
         },
         // for testing rn
         reset() {

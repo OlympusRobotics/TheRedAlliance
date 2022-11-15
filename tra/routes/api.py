@@ -74,6 +74,9 @@ def edit_form(code):
     for q in json_repr["questions"]:
         db.session.add(FormQuestion(code=q["code"], form=form, data=json.dumps(q)))
 
+    # if empty name, make the name "Empty Form Name"
+    if len(json_repr["name"]) == 0:
+        json_repr["name"] = "Untitled Form" 
     form.json_repr = json.dumps(json_repr)
     form.draft = json_repr["draft"]
     form.name = json_repr["name"]
@@ -96,7 +99,7 @@ def delete_form(code):
 
 
 @bp.route("/getform/<code>")
-@limiter.limit("1/second")
+@limiter.limit("3/second")
 def get_form_data(code):
     """Returns JSON repr of form"""
     admin = authorized(session)
