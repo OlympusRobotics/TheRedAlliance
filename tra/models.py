@@ -33,7 +33,9 @@ class Form(db.Model):
         db.Text, nullable=False, default=json.dumps({})
     )  # the full json representation of the form
     admin_id = db.Column(db.Integer, db.ForeignKey("admin.id"), nullable=False)
-    questions = db.relationship("FormQuestion", backref="form", lazy=True)
+    questions = db.relationship("FormQuestion", backref="form")
+    def __repr__(self):
+        return f"{self.name} | {self.questions}"
 
 
 class FormQuestion(db.Model):
@@ -43,7 +45,7 @@ class FormQuestion(db.Model):
     )  # the identifier that will be used in the JS
     form_id = db.Column(db.Integer, db.ForeignKey("form.id"), nullable=False)
     data = db.Column(db.Text, nullable=False)  # json object that contains format
-    responses = db.Column(db.Text, nullable=True)  # json list of objects
+    responses = db.Column(db.Text, nullable=False, default="[]")  # json list of objects
 
     def __repr__(self):
         return f"{self.code} | {self.data} |{self.responses} "

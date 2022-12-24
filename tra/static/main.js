@@ -46,11 +46,15 @@ function notificationHandler() {
         type: "is-success",
         text: "test",
         animated : false,
+        timeout : 3000,
+        async init() {
+          await this.$nextTick();
+        },
         async updateNoti(e) {
             this.type = e.detail.cat;
             this.text = e.detail.msg;
             this.animated = true;
-            await new Promise(r => setTimeout(r, 5000));
+            await new Promise(r => setTimeout(r, this.timeout));
             this.animated = false;
         }
     }
@@ -64,11 +68,12 @@ function notify(msg, cat) {
         {
             detail : {
                 msg : msg,
-                category : cat
+                cat : cat
                 }   
             }
         )
   );
+  console.log("Notify called")
 }
 
 // checks if the request is ok then converts to json

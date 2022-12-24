@@ -1,85 +1,137 @@
-{% extends 'base.html' %}
-{% block content %}
+{% extends 'base.html' %} {% block content %}
 
 <div x-data="formRender()">
-    <h1 class="title is-3" x-text="name"></h1>
-    <hr class="title-hr">
-    <div class="columns is-centered">
-        <div class="column is-two-thirds">
-            <!--QUESTIONS-->
-            <section x-show="!showQRCode" class="box">
-                <template x-for="(question, index) in questions">
-                    <div class="">
-                        <template x-for="comp in question.components">
-                            <div class="">
-                                <!--If it is a prompt-->
-                                <template x-if="PropertyTypes.Prompt.equals(comp.type)">
-                                    {% include 'public/components/prompt.html' %}
-                                </template>
-                                <!--If it is a textbox-->
-                                <template x-if="PropertyTypes.TextBox.equals(comp.type)">
-                                    {% include 'public/components/textbox.html' %}
-                                </template>
-                            </div>
-                        </template>
-                        <hr>
-                    </div>
+  <h1 class="title is-3" x-text="name"></h1>
+  <hr class="title-hr" />
+  <div class="columns is-centered">
+    <div class="column is-two-thirds">
+      <!--QUESTIONS-->
+      <section x-show="!showQRCode" class="box">
+        <template x-for="(question, index) in questions">
+          <div class="">
+            <template x-for="comp in question.components">
+              <div class="">
+                <!--If it is a prompt-->
+                <template x-if="PropertyTypes.Prompt.equals(comp.type)">
+                  {% include 'public/components/prompt.html' %}
                 </template>
-                <button @click="genQRCode()" class="button is-primary">Generate QR Code</button>
-            </section>
-            <section x-show="showQRCode" class="box" style="text-align: center;">
-                <div style="margin: auto;">
-                    <img :src="qrcode">
-                    <br>
-                    <span class="title is-4">Scan To Submit Response</span>
-                    <br>
-                    <button @click="showQRCode = !showQRCode" class="button is-primary mt-4">Create New Response</button>
-                    <br>
-                    <i @clickclass="fa-solid fa-download button is-info mt-4"></i>
-                </div>
-            </section>
+                <!--If it is a textbox-->
+                <template x-if="PropertyTypes.TextBox.equals(comp.type)">
+                  {% include 'public/components/textbox.html' %}
+                </template>
+              </div>
+            </template>
+            <hr />
+          </div>
+        </template>
+        <button @click="genQRCode()" class="button is-primary">
+          Generate QR Code
+        </button>
+      </section>
+      <section x-show="showQRCode" class="box" style="text-align: center">
+        <div style="margin: auto">
+          <img :src="qrcode" />
+          <br />
+          <span class="title is-4">Scan To Submit Response</span>
+          <br />
+          <button @click="submitRes()" :disabled="!isOnline" class="button is-success mt-4">
+            Submit to Cloud
+          </button>
+          <br />
+          <button
+            @click="() => {
+                        showQRCode = !showQRCode;
+                        resetRes();
+                    }"
+            class="button is-primary mt-4"
+          >
+            Create New Response
+          </button>
+          <br />
+          <button @click="showQRCode = !showQRCode" class="button is-link mt-4">
+            Change Response
+          </button>
+          <br />
+          <button class="button is-info mt-4">
+            <span class="icon">
+              <i @click="downloadQRCode()" class="fa-solid fa-download"></i>
+            </span>
+          </button>
         </div>
+      </section>
     </div>
+  </div>
 </div>
 
 <script>
-    function formRender() {
-        return {
-            name : null,
-            code : null,
-            questions : null,
-            responses : null, 
-            showQRCode : false,
-            qrcode : "",
-            async init() {
-                await this.getForm();  
-            },
-            getForm() {
-                fetch("/api/getform/" + location.href.split('/')[3])
-                .then(req => checkOk(req))
-                .then(req => {
-                    this.questions = req.questions;
-                    this.name = req.name;
-                    this.responses = Array(this.questions.length).fill(""); // init empty response list. -1 indicates empty res
-                });
-            },
-            genQRCode() {
-                // why is js like this i wanna die
-                var out;
-                QRCode.toDataURL(JSON.stringify(this.responses), { version: 13 }, function (err, url) {
-                    out = url;
-                });
-                this.qrcode = out;
-                this.showQRCode = true;
-            },
-            downloadQRCode(dataurl, filename) {
-                const link = document.createElement("a");
-                link.href = this.qrcode;
-                link.download = `${this.name}-${this.code}-qrcode`;
-                link.click();
-            }
-        };
-    }
+  function formRender() {
+    return {
+      name: null,
+      isOnline: true,
+      code: null,
+      questions: null,
+      responses: [],
+      showQRCode: false,
+      qrcode: "",
+      async init() {
+        await this.getForm();
+        // if connected or disconnected, update isOnline accordingly
+        window.addEventListener("offline", () => {
+          this.isOnline = false;
+        });
+        window.addEventListener("online", () => {
+          this.isOnline = true;
+        });
+      },
+      submitRes() {
+        fetch("/api/respond/" + this.code, {
+          headers : {
+              'Content-Type' : 'application/json'
+          },
+          method: "POST",
+          body: JSON.stringify({responses : this.responses}),
+        })
+          .then((res) => checkOk(res))
+          .then((res) => {
+            notify("Response Recorded", "is-success");
+            this.showQRCode = !this.showQRCode;
+            this.resetRes();
+          });
+      },
+      async getForm() {
+        fetch("/api/getform/" + location.href.split("/")[3])
+          .then((res) => checkOk(res))
+          .then((res) => {
+            this.questions = res.questions;
+            this.name = res.name;
+            this.code = res.code;
+            this.resetRes();
+          });
+      },
+      genQRCode() {
+        // why is js like this i wanna die
+        var out;
+        QRCode.toDataURL(
+          JSON.stringify(this.responses),
+          { version: 13 },
+          function (err, url) {
+            out = url;
+          }
+        );
+        this.qrcode = out;
+        this.showQRCode = true;
+      },
+      downloadQRCode() {
+        const link = document.createElement("a");
+        link.href = this.qrcode;
+        link.download = `${this.name}-${this.code}-qrcode`;
+        link.click();
+      },
+      resetRes() {
+        this.responses = Array(this.questions.length).fill(""); // init empty response list. -1 indicates empty res
+      },
+    };
+  }
 </script>
 
 <script src="/static/node_modules/qrcode/build/qrcode.js"></script>

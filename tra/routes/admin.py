@@ -24,9 +24,13 @@ bp = Blueprint("admin", __name__, url_prefix="/admin")
 @bp.route("")
 @bp.route("/")
 def admin_page():
-
     admin = authorized(session)
     return render_template("admin/admin.html", admin=admin)
+
+@bp.route("/responses/<code>")
+def form_res(code):
+    admin = authorized(session)
+    return render_template("admin/form_res.html", admin=admin)
 
 
 # handle admin login and setup
