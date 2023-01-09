@@ -110,7 +110,7 @@ def get_form_data(code):
 
 
 @bp.route("/getforms", methods=["GET"])
-@limiter.limit("1/second")
+@limiter.limit("2/second")
 def get_forms():
     "Return list of form titles, codes, and draft state. Auth required"
     admin = authorized(session)
@@ -165,6 +165,7 @@ def validate_username(username):
 
 
 @bp.route("/admin/is_username_valid", methods=["GET"])
+@limiter.limit("4/sec")
 def is_username_valid():
     """
     Wrapper for 'validate_username' function
