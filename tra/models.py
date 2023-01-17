@@ -5,7 +5,7 @@ import datetime, string, random, json
 Relationships:
 
 Admins have accounts which contain Forms. 
-Forms are composed of FormQuestions which store their own response data.
+Forms are composed of FormQuestions and TeamData. TeamData stores response JSON objects based on team number.
 """
 
 
@@ -34,18 +34,34 @@ class Form(db.Model):
     )  # the full json representation of the form
     admin_id = db.Column(db.Integer, db.ForeignKey("admin.id"), nullable=False)
     questions = db.relationship("FormQuestion", backref="form")
+    teams = db.relationship("Team", backref="form")
     def __repr__(self):
         return f"{self.name} | {self.questions}"
-
+    
+class Team(db.Model):
+    id = db.Column("id", db.Integer, primary_key=True)  # pk
+    number = db.Column(
+        db.Integer, unique=True, nullable=False
+    )
+    form_id = db.Column(db.Integer, db.ForeignKey(Form.id), nullable=False)
+    responses = db.relationship("Response", backref="team")
 
 class FormQuestion(db.Model):
     id = db.Column("id", db.Integer, primary_key=True)  # pk
     code = db.Column(
         db.String(6), unique=True, nullable=False
     )  # the identifier that will be used in the JS
-    form_id = db.Column(db.Integer, db.ForeignKey("form.id"), nullable=False)
+    form_id = db.Column(db.Integer, db.ForeignKey(Form.id), nullable=False)
     data = db.Column(db.Text, nullable=False)  # json object that contains format
-    responses = db.Column(db.Text, nullable=False, default="[]")  # json list of objects
+    responses = db.relationship("Response", backref="question")
 
     def __repr__(self):
         return f"{self.code} | {self.data} |{self.responses} "
+
+class Response(db.Model):
+    id = db.Column("id", db.Integer, primary_key=True)  # pk
+    name = db.Column(db.Text, nullable=False)
+    text = db.Column(db.Text, default="No response") 
+    question_id = db.Column(db.Integer, db.ForeignKey(FormQuestion.id), nullable=False)
+    team_id = db.Column(db.Integer, db.ForeignKey("team.id"), nullable=False)
+
