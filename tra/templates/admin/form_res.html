@@ -1,28 +1,12 @@
 {% extends 'base.html' %} {% block content %}
 
 <div x-data="formRes()">
-  <h1 class="title is-3" x-text="name"></h1>
+  <h1 class="title is-3" x-text="'Responses for ' + title"></h1>
   <hr class="title-hr" />
   <div class="columns is-centered">
     <div class="column is-two-thirds">
-      <template x-for="(question, index) in questions">
-        <div class="box question-card" x-data="{show : false}">
-          <template x-for="comp in question.components">
-            <!--Only show the prompt. Skip other components-->
-            <template x-if="PropertyTypes.Prompt.equals(comp.type)">
-              {% include 'public/components/prompt.html' %}
-            </template>
-          </template>
-          <hr />
-          <button class="button is-primary is-small mb-3 is-medium" x-text="show ? 'Close' : 'Show Responses'" @click="show = !show"></button>
-          <div x-show="show" x-transition.duration.500ms>
-            <template x-for="res in await getResponses(question.code)">
-              <div class="box">
-                <span class="is-size-5" x-text="res"></span>
-              </div>
-            </template>
-          </div>
-        </div>
+      <template x-for="teamNum in teamNums">
+        
       </template>
     </div>
   </div>
@@ -31,26 +15,34 @@
 <script>
   const formRes = () => ({
     questions: [],
-    name: "",
+    teamNums : [],
+    title: "",
     code: "",
     async init() {
       await this.getForm();
+      await this.getNums();
       await this.$nextTick();
     },
-    async getResponses(questionCode) {
+    async getNums() {
+      await fetch("/api/getteamnums/" + this.code, {
+        credentials: "same-origin",
+      }).then((res) => checkOk(res))
+      .then((res) => this.teamNums = res.numbers);
+    },
+    async getResponses(teamCode) {
       // gets the responses of a question
-      let res = await fetch(`/api/getdata/${this.code}/${questionCode}`, {
+      let res = await fetch(`/api/getdata/${this.code}/${teamCode}`, {
         credentials: "same-origin",
       }).then((res) => checkOk(res));
 
       return res.data;
     },
     async getForm() {
-      fetch("/api/getform/" + location.href.split("/")[5])
+      await fetch("/api/getform/" + location.href.split("/")[5])
         .then((res) => checkOk(res))
         .then((res) => {
           this.questions = res.questions;
-          this.name = res.name;
+          this.title = res.name;
           this.code = res.code;
         });
     },

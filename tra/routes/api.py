@@ -2,7 +2,7 @@
 from tra import db, limiter
 import re, random, string, json
 from tra.helpers import authorized
-from tra.models import Admin, Form, FormQuestion
+from tra.models import Admin, Form, FormQuestion, Team, Response
 from flask import Blueprint, request, render_template, session, jsonify, abort, flash
 
 bp = Blueprint("api", __name__, url_prefix="/api")
@@ -125,27 +125,49 @@ def get_forms():
 def respond(code):
     form = Form.query.filter_by(code=code).first_or_404()
     responses = request.json["responses"]
+    name = request.json["name"]
+    team_num = request.json["teamNum"]
+    team_data = Team.query.filter_by(number=team_num, form=form).first()
+    # no responses found for this team number. Create a new Team row
+    if team_data is None:
+        team_data = Team(number=team_num, form=form)
+        db.session.add(team_data)
+        db.session.commit()
+
     # link together the form questions and the responses
     for r, q in zip(responses, form.questions):
-        if r.strip() =="":
-            continue
-        # load the existing responses and append the new res and save
-        temp = json.loads(q.responses)
-        temp.append(r)
-        q.responses = json.dumps(temp)
+        # create the response object and link it to everything
+        db.session.add(Response(question=q, team=team_data, name=name, text=r))
     db.session.commit()
-    return {"status": 200}
+    return {'status' : 200}
 
-@bp.route("/getdata/<code>/<question_code>")
+@bp.route("/getteamnums/<code>")
 @limiter.limit("15/sec;80/minute")
-def get_question_data(code, question_code):
+def get_team_nums(code):
+    """ Returns a list of team numbers for the given form """
+    admin = authorized(session)
+    form = Form.query.filter_by(code=code, admin=admin).first_or_404()
+    return { "numbers" : 
+        [ team.number for team in form.teams ]
+    }
+
+
+@bp.route("/getdata/<code>/<team_num>")
+@limiter.limit("15/sec;80/minute")
+def get_question_data(code, team_num):
     "Returns the response data for a question for a given form code"
     admin = authorized(session)
     form = Form.query.filter_by(code=code, admin=admin).first_or_404()
-    question = FormQuestion.query.filter_by(code=question_code, form=form).first_or_404()
-    # check if the admin has access to this specific question
-    return {
-        "data" : json.loads(question.responses)
+    team = Team.query.filter_by(number=team_num, form=form).first_or_404()
+    
+    return { "data" :
+        [
+            {
+                "name" : res.name,
+                "text" : res.text
+            }
+            for res in team.responses
+        ]
     }
 
 MIN_USER_LEN = 6

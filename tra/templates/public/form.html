@@ -1,12 +1,21 @@
 {% extends 'base.html' %} {% block content %}
 
 <div x-data="formRender()">
-  <h1 class="title is-3" x-text="name"></h1>
+  <h1 class="title is-3" x-text="title"></h1>
   <hr class="title-hr" />
   <div class="columns is-centered">
-    <div class="column is-two-thirds">
+    <div class="column is-two-thirds mx-4">
       <!--QUESTIONS-->
       <section x-show="!showQRCode" class="box">
+        <div class="mb-2">
+          <label class="is-medium label">Name</label> 
+          <input x-model="name" class="input" placeholder="Jason Quang">
+        </div>
+        <div class="mb-6">
+          <label class="is-medium label">Current Scouting Team Number</label> 
+          <input x-model="teamNum" class="input" x-mask="9999999" placeholder="4982">
+        </div>
+        <hr>
         <template x-for="(question, index) in questions">
           <div class="">
             <template x-for="comp in question.components">
@@ -24,10 +33,11 @@
             <hr />
           </div>
         </template>
-        <button @click="genQRCode()" class="button is-primary">
+        <button @click="genQRCode()" class="button is-primary" :disabled="name.length == 0 || teamNum.length == 0">
           Generate QR Code
         </button>
       </section>
+      <!-- QR Code and submission -->
       <section x-show="showQRCode" class="box" style="text-align: center">
         <div style="margin: auto">
           <img :src="qrcode" />
@@ -66,7 +76,9 @@
 <script>
   function formRender() {
     return {
-      name: null,
+      title: "",
+      name: "",
+      teamNum: "",
       isOnline: true,
       code: null,
       questions: null,
@@ -89,7 +101,7 @@
               'Content-Type' : 'application/json'
           },
           method: "POST",
-          body: JSON.stringify({responses : this.responses}),
+          body: JSON.stringify({teamNum: this.teamNum, name: this.name, responses : this.responses}),
         })
           .then((res) => checkOk(res))
           .then((res) => {
@@ -103,7 +115,7 @@
           .then((res) => checkOk(res))
           .then((res) => {
             this.questions = res.questions;
-            this.name = res.name;
+            this.title = res.name;
             this.code = res.code;
             this.resetRes();
           });
@@ -124,10 +136,11 @@
       downloadQRCode() {
         const link = document.createElement("a");
         link.href = this.qrcode;
-        link.download = `${this.name}-${this.code}-qrcode`;
+        link.download = `${this.title}-${this.code}-qrcode`;
         link.click();
       },
       resetRes() {
+        this.teamNum = "";
         this.responses = Array(this.questions.length).fill(""); // init empty response list. -1 indicates empty res
       },
     };
