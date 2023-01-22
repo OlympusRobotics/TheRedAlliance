@@ -92,9 +92,18 @@ def delete_form(code):
     admin = authorized(session)
     # filter for a form that has the same code and same admin id
     form = Form.query.filter_by(admin_id=admin.id, code=code).first_or_404()
+    responses = Response.query.filter_by(form=form).all()
+    teams = Team.query.filter_by(form=form).all()
     # remove all the questions
     for q in form.questions:
         db.session.delete(q)
+    
+    for r in responses:
+        db.session.delete(r)
+
+    for t in teams:
+        db.session.delete(t)
+
     db.session.delete(form)
     db.session.commit()
     return {"status": 200}
@@ -124,7 +133,7 @@ def get_forms():
 @limiter.limit("30/minute")
 def respond(code):
     form = Form.query.filter_by(code=code).first_or_404()
-    responses = request.json["responses"]
+    response = request.json["responses"]
     name = request.json["name"]
     team_num = request.json["teamNum"]
     team_data = Team.query.filter_by(number=team_num, form=form).first()
@@ -134,11 +143,9 @@ def respond(code):
         db.session.add(team_data)
         db.session.commit()
 
-    # link together the form questions and the responses
-    for r, q in zip(responses, form.questions):
-        # create the response object and link it to everything
-        db.session.add(Response(question=q, team=team_data, name=name, text=r))
+    db.session.add(Response(team=team_data, form_id=form.id, name=name, data=json.dumps(response)))
     db.session.commit()
+
     return {'status' : 200}
 
 @bp.route("/getteamnums/<code>")
@@ -164,7 +171,7 @@ def get_question_data(code, team_num):
         [
             {
                 "name" : res.name,
-                "text" : res.text
+                "responses" : json.loads(res.data)
             }
             for res in team.responses
         ]
