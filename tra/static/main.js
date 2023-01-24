@@ -19,11 +19,13 @@ class Enum {
 class QuestionTypes extends Enum {
   static TextBox = new QuestionTypes("TextBox");
   static MultipleChoice = new QuestionTypes("MultipleChoice");
+  static ImageSelect = new QuestionTypes("ImageSelect");
 }
 
 class PropertyTypes extends Enum {
   static Prompt = new PropertyTypes("Prompt");
   static TextBox = new PropertyTypes("TextBox");
+  static ImageSelect = new PropertyTypes("ImageSelect");
   // contains all the properties for each of the property types
   static templates = new Map([
     [
@@ -35,9 +37,15 @@ class PropertyTypes extends Enum {
     [
       PropertyTypes.TextBox.toString(),
       {
-        placeholder: "Respond to the question",
+        placeholder: "Enter response",
       },
     ],
+    [
+      PropertyTypes.ImageSelect.toString(),
+      {
+        selected: [0, 0] // coordinates of the selected point
+      }
+    ]
   ]);
 }
 
@@ -46,7 +54,6 @@ function notificationHandler() {
         type: "is-success",
         text: "test",
         animated : false,
-        timeout : 3000,
         async init() {
           await this.$nextTick();
         },
@@ -54,21 +61,22 @@ function notificationHandler() {
             this.type = e.detail.cat;
             this.text = e.detail.msg;
             this.animated = true;
-            await new Promise(r => setTimeout(r, this.timeout));
+            await new Promise(r => setTimeout(r, e.detail.timeout));
             this.animated = false;
         }
     }
 }
 
 // creates a notification
-function notify(msg, cat) {
+function notify(msg, cat, timeout=3000) {
   window.dispatchEvent(
         // notify what went wrong
         new CustomEvent('notify', 
         {
             detail : {
                 msg : msg,
-                cat : cat
+                cat : cat,
+                timeout : timeout
                 }   
             }
         )

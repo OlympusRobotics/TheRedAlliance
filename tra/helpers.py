@@ -19,9 +19,6 @@ def authorized(session, abort_on_fail=True) -> Admin:
     return admin
 
 def set_key(admin, session, db) -> None:
-    """Creates a new key for the admin, commits it to db, and adds to session"""
-    admin.key = secrets.token_hex(256)
-    db.session.commit()
     session["admin"] = admin.key
 
 

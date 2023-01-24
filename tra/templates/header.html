@@ -2,7 +2,7 @@
 
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=550, initial-scale=1" />
+  <meta name="viewport" content="width=760, initial-scale=1" />
   {% if title %}
   <title>{{title}} - The Red Alliance</title>
   {% else %}
@@ -38,10 +38,7 @@
   <!-- Bulma js plugins  -->
   <script src="/static/bulmajs/dist/alert.js"></script>
   <!-- FA Icons -->
-  <script
-    src="https://kit.fontawesome.com/ef25e2b6d6.js"
-    crossorigin="anonymous"
-  ></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <!--Main js file-->
   <script src="{{ url_for('static', filename='main.js') }}"></script>
   <script>

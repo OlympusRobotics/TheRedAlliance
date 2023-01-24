@@ -1,30 +1,68 @@
 {% extends 'base.html' %} {% block content %}
 
-<div x-data="formRes()">
+<div x-data="formRes()" x-show="initialized">
   <h1 class="title is-3" x-text="'Responses for ' + title"></h1>
   <hr class="title-hr" />
-  <div class="columns is-centered">
+  <div x-data="QRCodeScanner()" class="is-flex is-justify-content-center">
+    <button @click="open()" class="button is-primary is-medium">Scan Response QR Code</button>
+  </div>
+
+  <div class="columns is-mobile is-centered my-5">
+    <div class="column is-one-third-desktop is-two-thirds-mobile">
+      <div id="reader"></div>
+    </div>
+  </div>
+  
+  <div class="columns is-mobile is-centered">
     <div class="column is-two-thirds mx-5">
       <template x-for="teamNum in teamNums">
-        <div x-data="{show:false, responses: getResponses(teamNum)}" class="my-4">
-          <div class="box question-card is-flex is-justify-content-space-between" style="background-color: #e9e9e9;">
-            <span x-text="'Team #'+ teamNum" class="is-medium label"></span> 
-            <button x-text="show ? 'Close' : 'Show Responses'" @click="show = !show" class="is-primary button"></button>
+        <div
+          x-data="{show:false}"
+          class="my-4"
+        >
+          <div
+            class="box question-card is-flex is-justify-content-space-between"
+            style="background-color: #e9e9e9"
+          >
+            <span x-text="'Team #'+ teamNum" class="is-medium label"></span>
+            <button
+              x-text="show ? 'Close' : 'Show Responses'"
+              @click="show = !show"
+              class="is-primary button"
+            ></button>
           </div>
-          <div x-show="show" class="box question-card" style="background-color:#e9e9e9;">
+          <div
+            x-show="show"
+            class="box question-card"
+            style="background-color: #e9e9e9"
+          >
             <template x-for="(q, i) in questions">
               <div>
-                <label x-text="q.components[0].text" class="label is-medium mt-3"></label>
-                <div class="columns is-multiline">
-                  <template x-for="res in responses">
-                    <div class="column" >
-                      <div x-tooltip="res.name" class="box mx-2" x-text="res.responses[i]"></div>
-                    </div>
-                  </template>
-                </div>
+                <label
+                  x-text="q.components[0].text"
+                  class="label is-medium mt-3"
+                ></label>
+                <!-- textbox  -->
+                <template
+                  x-if="PropertyTypes.TextBox.equals(q.components[1].type)"
+                >
+                  <div class="columns is-multiline is-mobile">
+                    <template x-for="res in resMap[teamNum] ">
+                      <template x-if="res.responses[i].length !== 0">
+                        <div class="column is-narrow">
+                          <div
+                            x-tooltip="res.name"
+                            class="box mx-2"
+                            x-text="res.responses[i]"
+                          ></div>
+                        </div>
+                      </template>
+                    </template>
+                  </div>
+                </template>
               </div>
             </template>
-          </div> 
+          </div>
         </div>
       </template>
     </div>
@@ -33,14 +71,27 @@
 
 <script>
   const formRes = () => ({
+    initialized: false, // wait for data to be fetched
     questions: [],
     teamNums: [],
-    responses: [],
+    resMap : {}, // map: { teamNum : responses }
     title: "",
     code: "",
     async init() {
       await this.getForm();
       await this.getNums();
+      // if connected or disconnected, update isOnline accordingly
+      window.addEventListener("offline", () => {
+        this.isOnline = false;
+      });
+      window.addEventListener("online", () => {
+        this.isOnline = true;
+      });
+
+      // build map
+      for (const num of this.teamNums) {
+        this.resMap[num] = await this.getResponses(num);
+      }
       await this.$nextTick();
     },
     async getNums() {
@@ -65,9 +116,25 @@
           this.questions = res.questions;
           this.title = res.name;
           this.code = res.code;
+          this.initialized = true;
         });
     },
   });
+
+  const QRCodeScanner = () => ({
+    scanner: new Html5QrcodeScanner(
+      "reader",
+      { fps: 10, qrbox: { width: 250, height: 250 } },
+      /* verbose= */ false
+    ),
+    open() {
+      this.scanner.render(this.scan, () => {});
+    },
+    scan(decodedText, decodedResult) {
+      this.$dispatch("scannedRes", {data : JSON.parse(decodedText)});
+    }
+  });
 </script>
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
 {% endblock %}

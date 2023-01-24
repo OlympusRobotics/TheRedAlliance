@@ -32,7 +32,6 @@ function notifyHandler() {
     remove(noti) {
       // if it is just being called on the first animation event dont do anything
       if (!noti.initialized) return null;
-      console.log("wuaww")
       this.notifications = this.notifications.filter((a) => a != noti)
     }
   }

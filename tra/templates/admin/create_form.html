@@ -1,221 +1,242 @@
-{% extends 'base.html' %}
-{% block content %}
+{% extends 'base.html' %} {% block content %}
 
 <h1 class="title is-3">Create New Scouting Form</h1>
-<hr class="title-hr">
+<hr class="title-hr" />
 
-<section x-data="formCreator()" 
-         class="box">
-    <div class="is-flex is-justify-content-center mb-4">
-        <span class="title is-6">
-            <div x-show="!saving" >
-                <i class="fa-solid fa-cloud"></i>
-                Saved
-            </div>
-            <div x-show="saving">
-                <i class="fa-solid fa-rotate"></i>
-                Saving
-            </div>
-        </span>
-    </div>
-    <div class="is-flex is-justify-content-center mb-4">
-        <div class="field is-horizontal">
-            <div class="field-label is-large">
-                <label class="label">Title</label>
-            </div>
-            <div class="field-body">
-                <div class="field">
-                    <input maxlength="40" x-model="data.name" class="input" type="text" placeholder="Title e.g. 2022 Rapid React">
-                </div>
-            </div>
+<section x-data="formCreator()" class="box">
+  <div class="is-flex is-justify-content-center mb-4">
+    <span class="title is-6">
+      <div x-show="!saving">
+        <i class="fa-solid fa-cloud"></i>
+        Saved
+      </div>
+      <div x-show="saving">
+        <i class="fa-solid fa-rotate"></i>
+        Saving
+      </div>
+    </span>
+  </div>
+  <div class="is-flex is-justify-content-center mb-4">
+    <div class="field is-horizontal">
+      <div class="field-label is-large">
+        <label class="label">Title</label>
+      </div>
+      <div class="field-body">
+        <div class="field">
+          <input
+            maxlength="40"
+            x-model="data.name"
+            class="input"
+            type="text"
+            placeholder="Title e.g. 2022 Rapid React"
+          />
         </div>
+      </div>
     </div>
-    <div class="container">
-        <div class="columns is-centered">
-            <div class="column">
-                <div id="questions">
-                    <!-- This is where all the added questions will go -->
-                    <!-- whenever questions changes, save it to localstorage -->
-                    <template 
-                    x-data
-                    x-for="question in data.questions">
-                        <!-- div just to hold child elements. Also scrolls down when created -->
-                        <div x-init="$nextTick(() => {window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})})">
-                            <button @click="removeQuestion(question)" style="float: right;" class="delete is-medium"></button>
-                            <div class="box mt-5">
-                                <template 
-                                x-id="['text-input', 'question-prompt']"
-                                x-for="comp in question.components"
-                                >
-                                <!-- div required because template with x-for can only have one root element -->
-                                    <div>
-                                        <!--If it is a prompt-->
-                                        <template x-if="PropertyTypes.Prompt.equals(comp.type)">
-                                            {% include 'properties/prompt.html' %}
-                                        </template>
-                                        <!--If it is a textbox-->
-                                        <template x-if="PropertyTypes.TextBox.equals(comp.type)">
-                                            {% include 'properties/textbox.html' %}
-                                        </template>
-                                    </div>
-                               </template>
-                            </div>
-                        </div>
+  </div>
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column">
+        <div id="questions">
+          <!-- This is where all the added questions will go -->
+          <!-- whenever questions changes, save it to localstorage -->
+          <template x-data x-for="question in data.questions">
+            <!-- div just to hold child elements. Also scrolls down when created -->
+            <div
+              x-init="$nextTick(() => {window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})})"
+            >
+              <button
+                @click="removeQuestion(question)"
+                style="float: right"
+                class="delete is-medium"
+              ></button>
+              <div class="box mt-5">
+                <template
+                  x-id="['text-input', 'question-prompt']"
+                  x-for="comp in question.components"
+                >
+                  <!-- div required because template with x-for can only have one root element -->
+                  <div>
+                    <!--If it is a prompt-->
+                    <template x-if="PropertyTypes.Prompt.equals(comp.type)">
+                      {% include 'properties/prompt.html' %}
                     </template>
-                </div>
+                    <!--If it is a textbox-->
+                    <template x-if="PropertyTypes.TextBox.equals(comp.type)">
+                      {% include 'properties/textbox.html' %}
+                    </template>
+                    <!--If it is an image select -->
+                    <template
+                      x-if="PropertyTypes.ImageSelect.equals(comp.type)"
+                    >
+                      {% include 'properties/imageselect.html' %}
+                    </template>
+                  </div>
+                </template>
+              </div>
             </div>
+          </template>
         </div>
-
+      </div>
     </div>
-<button 
-:disabled="!(data.questions.length <= 15)" 
-id="add-question" 
-@click="createQuestion()" 
-class=" button is-primary is-medium mt-4" style="width: 100%;">
-Add New Question
-</button>
-<button @click="reset">reset (for testing)</button>
+  </div>
+  <div x-data="{addQuestion : false}">
+    <div x-show="!addQuestion">
+        <button
+            :disabled="!(data.questions.length <= 15)"
+            id="add-question"
+            @click="addQuestion = true"
+            class="button is-primary is-medium mt-4"
+            style="width: 100%"
+        >
+            Add New Question
+        </button>
+    </div>
+    <div x-show="addQuestion">
+      <div class="buttons are-medium mt-4 is-flex is-justify-content-center">
+          <button @click="createQuestion(QuestionTypes.TextBox)" class="button is-primary">Textbox</button>
+          <button @click="createQuestion(QuestionTypes.ImageSelect)" class="button is-primary">Image Select</button>
+          <button @click="addQuestion = false" class="button is-danger is-outlined">X</button>
+      </div>
+    </div>
+  </div>
 </section>
 <script>
-function formCreator() {
+  function formCreator() {
     return {
-        // data that is saved to server
-        data : {
-            code : "",
-            name : "",
-            draft : true, // stores if the form is complete or not
-            questions : [],
-            timer : null,
-        },
-        saving : false,
-        lastSaved : Date.now(),
-        initialized : false,
-        init() {
-            this.fetchForm();
-            this.$watch('data', q=>this.saveForm());
-            // if the form is saving let the user know
-            this.$watch('saving', q=> {
-                if (this.saving) {
-                    window.onbeforeunload = (e) => {
-                        return "";
-                    }
-                }
-                else {
-                    window.onbeforeunload = () => {}; // remove event listener
-                }
-            })
-        },
-        fetchForm() {
+      // data that is saved to server
+      data: {
+        code: "",
+        name: "",
+        draft: true, // stores if the form is complete or not
+        questions: [],
+        timer: null,
+      },
+      saving: false,
+      lastSaved: Date.now(),
+      initialized: false,
+      init() {
+        this.fetchForm();
+        this.$watch("data", (q) => this.saveForm());
+        // if the form is saving let the user know
+        this.$watch("saving", (q) => {
+          if (this.saving) {
+            window.onbeforeunload = (e) => {
+              return "";
+            };
+          } else {
+            window.onbeforeunload = () => {}; // remove event listener
+          }
+        });
+      },
+      fetchForm() {
         // get the json repr and turn into alpine object
-            fetch("/api/getform/" + new URL(location.href).searchParams.get("code"))
-            .then(req => checkOk(req))
-            .then(req => {
-                this.data.code = req.code;
-                this.data.draft = req.draft;
-                this.data.questions = req.questions;
-                this.data.name = req.name;
-            })
-        },
-        createQuestion() {
-            this.data.questions.push(
-                formQuestion(QuestionTypes.TextBox)
-            );
-        },
-        removeQuestion(question) {
-            var data = this.data;
-            // create the alert modal
-            Bulma().alert({ 
-                    type: 'danger',
-                    title: "Delete Question?",
-                    body: "Are you sure you would like to delete this question? This action cannot be undone",
-                    confirm: {
-                        label: "Delete",
-                        classes : ['is-outlined'],
-                        onClick : (() => {
-                            data.questions = data.questions.filter(
-                                q => q != question // filter out the question that is specified to delete
-                            );
-                        })
-                    },
-                    cancel: {
-                        label : "Go Back",
-                        classes : ['is-outlined', 'is-success'],
-                    },
-                }
-            )
-        },
-        // wrapper to debounce the save function. 1 sec timeout
-        saveForm() {
-            this.saving = true;
-            clearTimeout(this.timer);
-            this.timer = setTimeout(() => { this._saveForm(); } , 1000);
-        },
-        _saveForm() {
-            // dont save first time this function is called
-            // TODO: fix
-            console.log("saving")
-            fetch("/api/editform/" + this.data.code, {
-                credentials : 'same-origin',
-                method : "POST",
-                headers : {
-                    'Content-Type' : 'application/json'
-                },
-                // only send the data that is needed by server
-                body: JSON.stringify(this.data)
-            })
-            .then(req => this.saving = false);
-        },
-        // for testing rn
-        reset() {
-            this.questions = [];
-        },
-    }
-}
-// object for storing each question's data
-function formQuestion(questionType) {
+        fetch("/api/getform/" + new URL(location.href).searchParams.get("code"))
+          .then((req) => checkOk(req))
+          .then((req) => {
+            this.data.code = req.code;
+            this.data.draft = req.draft;
+            this.data.questions = req.questions;
+            this.data.name = req.name;
+          });
+      },
+      createQuestion(questionType) {
+        this.data.questions.push(formQuestion(questionType));
+      },
+      removeQuestion(question) {
+        var data = this.data;
+        // create the alert modal
+        Bulma().alert({
+          type: "danger",
+          title: "Delete Question?",
+          body: "Are you sure you would like to delete this question? This action cannot be undone",
+          confirm: {
+            label: "Delete",
+            classes: ["is-outlined"],
+            onClick: () => {
+              data.questions = data.questions.filter(
+                (q) => q != question // filter out the question that is specified to delete
+              );
+            },
+          },
+          cancel: {
+            label: "Go Back",
+            classes: ["is-outlined", "is-success"],
+          },
+        });
+      },
+      // wrapper to debounce the save function. 1 sec timeout
+      saveForm() {
+        this.saving = true;
+        clearTimeout(this.timer);
+        this.timer = setTimeout(() => {
+          this._saveForm();
+        }, 1000);
+      },
+      _saveForm() {
+        // dont save first time this function is called
+        // TODO: fix
+        console.log("saving");
+        fetch("/api/editform/" + this.data.code, {
+          credentials: "same-origin",
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          // only send the data that is needed by server
+          body: JSON.stringify(this.data),
+        }).then((req) => (this.saving = false));
+      },
+      // for testing rn
+      reset() {
+        this.questions = [];
+      },
+    };
+  }
+  // object for storing each question's data
+  function formQuestion(questionType) {
     return {
-        // random id. Does not need to be terribly unique
-        code : (Math.random() + 1).toString(36).substring(2),
-        type : questionType,
-        // defined in main.js
-        components : getDefaultComponents(questionType),
-    }
-}
+      // random id. Does not need to be terribly unique
+      code: (Math.random() + 1).toString(36).substring(2),
+      type: questionType,
+      // defined in main.js
+      components: getDefaultComponents(questionType),
+    };
+  }
 
-// returns a questionComponent TEMPLATE
-function questionComponent(type) {
+  // returns a questionComponent TEMPLATE
+  function questionComponent(type) {
     var defaultComponents = {
-        edit : false,
-        type : type,
+      edit: false,
+      type: type,
     };
     // make sure it is a valid type
     if (PropertyTypes.templates.has(type.toString())) {
-        // copy all the template properties to the default properties
-        return Object.assign(
-                defaultComponents, 
-                PropertyTypes.templates.get(type.toString())
-            );
+      // copy all the template properties to the default properties
+      return Object.assign(
+        defaultComponents,
+        PropertyTypes.templates.get(type.toString())
+      );
     }
-}
+  }
 
-function getDefaultComponents(type) {
-  var out = [];
-  // this is probably not the best way to do it but im stupid so...
-  // check the question type then return the appropriate property templates
-  if (QuestionTypes.TextBox.equals(type)) {
+  function getDefaultComponents(type) {
+    var out = [];
+    // this is probably not the best way to do it but im stupid so...
+    // check the question type then return the appropriate property templates
+    if (QuestionTypes.TextBox.equals(type)) {
       out.push(questionComponent(PropertyTypes.Prompt));
       out.push(questionComponent(PropertyTypes.TextBox));
-  }
-  else {
+    }
+    // if it is an image select question
+    else if (QuestionTypes.ImageSelect.equals(type)) {
+      out.push(questionComponent(PropertyTypes.Prompt));
+      out.push(questionComponent(PropertyTypes.ImageSelect));
+    } else {
       console.log("Bruh what kind of question is this? " + type);
+    }
+    return out;
   }
-  return out;
-}
-
 </script>
 
 {% endblock %}
-
-
-
-
