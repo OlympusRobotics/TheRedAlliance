@@ -4,22 +4,21 @@
   <h1 class="title is-3" x-text="'Responses for ' + title"></h1>
   <hr class="title-hr" />
   <div x-data="QRCodeScanner()" class="is-flex is-justify-content-center">
-    <button @click="open()" class="button is-primary is-medium">Scan Response QR Code</button>
+    <button @click="open()" class="button is-primary is-medium">
+      Scan Response QR Code
+    </button>
   </div>
 
   <div class="columns is-mobile is-centered my-5">
-    <div class="column is-one-third-desktop is-two-thirds-mobile">
+    <div class="column is-half-desktop is-two-thirds-mobile">
       <div id="reader"></div>
     </div>
   </div>
-  
+
   <div class="columns is-mobile is-centered">
     <div class="column is-two-thirds mx-5">
       <template x-for="teamNum in teamNums">
-        <div
-          x-data="{show:false}"
-          class="my-4"
-        >
+        <div x-data="{show:false}" class="my-4">
           <div
             class="box question-card is-flex is-justify-content-space-between"
             style="background-color: #e9e9e9"
@@ -74,7 +73,7 @@
     initialized: false, // wait for data to be fetched
     questions: [],
     teamNums: [],
-    resMap : {}, // map: { teamNum : responses }
+    resMap: {}, // map: { teamNum : responses }
     title: "",
     code: "",
     async init() {
@@ -88,6 +87,7 @@
         this.isOnline = true;
       });
 
+      window.addEventListener("updateRes", (e) => this.updateRes(e));
       // build map
       for (const num of this.teamNums) {
         this.resMap[num] = await this.getResponses(num);
@@ -119,6 +119,19 @@
           this.initialized = true;
         });
     },
+    updateRes(e) {
+      // check if the num exists in the map
+      if (!this.resMap.hasOwnProperty(e.detail.data.num)) {
+      this.teamNums.push(e.detail.data.num);
+        this.resMap[e.detail.data.num] = [];
+      }
+      // append the response object to the response map
+      this.resMap[e.detail.data.num].push({
+        name: e.detail.data.name,
+        responses: e.detail.data.res,
+      });
+      notify(`Response from ${e.detail.data.name} was recorded`, "is-success");
+    },
   });
 
   const QRCodeScanner = () => ({
@@ -127,12 +140,32 @@
       { fps: 10, qrbox: { width: 250, height: 250 } },
       /* verbose= */ false
     ),
+    lastScanTime : Date.now(),
     open() {
       this.scanner.render(this.scan, () => {});
     },
     scan(decodedText, decodedResult) {
-      this.$dispatch("scannedRes", {data : JSON.parse(decodedText)});
-    }
+      /* 
+      decoded text should be {
+        num: teamNum,
+        name: name,
+        res: [responses]
+      }
+      */
+      // put 0.75 sec delay between qr code scans
+      if (Date.now() - this.lastScanTime < 1000) {
+        return;
+      }
+      // dispatches an updateRes event that will update the resMap in formRes
+      window.dispatchEvent(
+        new CustomEvent("updateRes", {
+          detail: {
+            data: JSON.parse(decodedText),
+          },
+        })
+      );
+      this.lastScanTime = Date.now();
+    },
   });
 </script>
 <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>

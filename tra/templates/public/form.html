@@ -124,7 +124,13 @@
         // why is js like this i wanna die
         var out;
         QRCode.toDataURL(
-          JSON.stringify(this.responses),
+          JSON.stringify(
+            {
+              name: this.name,
+              num: parseInt(this.teamNum),
+              res: this.responses
+            }
+          ),
           { version: 13 },
           function (err, url) {
             out = url;

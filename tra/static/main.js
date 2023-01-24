@@ -68,7 +68,7 @@ function notificationHandler() {
 }
 
 // creates a notification
-function notify(msg, cat, timeout=3000) {
+function notify(msg, cat, timeout=1500) {
   window.dispatchEvent(
         // notify what went wrong
         new CustomEvent('notify', 
