@@ -28,6 +28,9 @@
                 <template x-if="PropertyTypes.TextBox.equals(comp.type)">
                   {% include 'public/components/textbox.html' %}
                 </template>
+                <template x-if="PropertyTypes.ImageSelect.equals(comp.type)">
+                  {% include 'public/components/imageselect.html' %}
+                </template>
               </div>
             </template>
             <hr />
@@ -62,9 +65,9 @@
             Change Response
           </button>
           <br />
-          <button class="button is-info mt-4">
+          <button @click="downloadQRCode()" class="button is-info mt-4">
             <span class="icon">
-              <i @click="downloadQRCode()" class="fa-solid fa-download"></i>
+              <i class="fa-solid fa-download"></i>
             </span>
           </button>
         </div>
@@ -82,10 +85,10 @@
       isOnline: true,
       code: null,
       questions: null,
-      responses: [],
       showQRCode: false,
       qrcode: "",
       async init() {
+        
         await this.getForm();
         // if connected or disconnected, update isOnline accordingly
         window.addEventListener("offline", () => {
@@ -101,7 +104,7 @@
               'Content-Type' : 'application/json'
           },
           method: "POST",
-          body: JSON.stringify({teamNum: this.teamNum, name: this.name, responses : this.responses}),
+          body: JSON.stringify({teamNum: this.teamNum, name: this.name, responses : this.$store.responses}),
         })
           .then((res) => checkOk(res))
           .then((res) => {
@@ -128,7 +131,7 @@
             {
               name: this.name,
               num: parseInt(this.teamNum),
-              res: this.responses
+              res: this.$store.responses
             }
           ),
           { version: 13 },
@@ -147,7 +150,8 @@
       },
       resetRes() {
         this.teamNum = "";
-        this.responses = Array(this.questions.length).fill(""); // init empty response list. -1 indicates empty res
+        // init empty response list.
+        Alpine.store("responses", Array(this.questions.length).fill(""));
       },
     };
   }

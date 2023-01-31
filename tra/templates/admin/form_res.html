@@ -30,38 +30,58 @@
               class="is-primary button"
             ></button>
           </div>
-          <div
-            x-show="show"
-            class="box question-card"
-            style="background-color: #e9e9e9"
-          >
-            <template x-for="(q, i) in questions">
-              <div>
-                <label
-                  x-text="q.components[0].text"
-                  class="label is-medium mt-3"
-                ></label>
-                <!-- textbox  -->
-                <template
-                  x-if="PropertyTypes.TextBox.equals(q.components[1].type)"
-                >
-                  <div class="columns is-multiline is-mobile">
-                    <template x-for="res in resMap[teamNum] ">
-                      <template x-if="res.responses[i].length !== 0">
-                        <div class="column is-narrow">
-                          <div
-                            x-tooltip="res.name"
-                            class="box mx-2"
-                            x-text="res.responses[i]"
-                          ></div>
-                        </div>
+          <template x-if="show">
+            <div
+              class="box question-card"
+              style="background-color: #e9e9e9"
+            >
+              <template x-for="(q, i) in questions">
+                <div>
+                  <label
+                    x-text="q.components[0].text"
+                    class="label is-medium mt-3"
+                  ></label>
+                  <!-- textbox  -->
+                  <template
+                    x-if="PropertyTypes.TextBox.equals(q.components[1].type)"
+                  >
+                    <div class="columns is-multiline is-mobile">
+                      <template x-for="res in resMap[teamNum] ">
+                        <template x-if="res.responses[i].length !== 0">
+                          <div class="column is-narrow">
+                            <div
+                              x-tooltip="res.name"
+                              class="box mx-2"
+                              x-text="res.responses[i]"
+                            ></div>
+                          </div>
+                        </template>
                       </template>
-                    </template>
-                  </div>
-                </template>
-              </div>
-            </template>
-          </div>
+                    </div>
+                  </template>
+                  <template
+                    x-if="PropertyTypes.ImageSelect.equals(q.components[1].type)"
+                  >
+                    <div x-data="{ coords: { x : 0, y : 0 } }">
+                      <img
+                        x-init="img = $el"
+                        src="/static/assets/field.jpg"
+                        class="image mt-3 mx-3"
+                        style="width: fit-content"
+                      />
+                      <template x-for="res in resMap[teamNum]">
+                        <div
+                          x-tooltip="res.name"
+                          class="image-select-dot"
+                          :style="{ left: res.responses[i][0] + coords.x + 'px', top: res.responses[i][1] + coords.y + 'px'}"
+                        ></div>
+                      </template>
+                    </div>
+                  </template>
+                </div>
+              </template>
+            </div>
+          </template>
         </div>
       </template>
     </div>
@@ -73,21 +93,42 @@
     initialized: false, // wait for data to be fetched
     questions: [],
     teamNums: [],
+    unsavedRes: [],
+    isOnline: true,
     resMap: {}, // map: { teamNum : responses }
     title: "",
     code: "",
     async init() {
       await this.getForm();
       await this.getNums();
+      // watch the unsaved responses and save them to localstorage
+      this.$watch("unsavedRes", (v) => {
+        localStorage.setItem("unsavedRes", JSON.stringify(v));
+      });
       // if connected or disconnected, update isOnline accordingly
       window.addEventListener("offline", () => {
         this.isOnline = false;
       });
       window.addEventListener("online", () => {
         this.isOnline = true;
+        for (const res of this.unsavedRes) {
+          this.submitRes(res.name, res.num, res.res);
+        }
+        // reset
+        this.unsavedRes = [];
       });
 
+      if (localStorage.getItem("unsavedRes")) {
+        this.unsavedRes = JSON.parse(localStorage.getItem("unsavedRes"));
+        for (const res of this.unsavedRes) {
+          this.submitRes(res.name, res.num, res.res);
+        }
+        this.unsavedRes = [];
+      }
+
+      // listen for updateRes event. Emitted on qr code scan success
       window.addEventListener("updateRes", (e) => this.updateRes(e));
+
       // build map
       for (const num of this.teamNums) {
         this.resMap[num] = await this.getResponses(num);
@@ -122,7 +163,7 @@
     updateRes(e) {
       // check if the num exists in the map
       if (!this.resMap.hasOwnProperty(e.detail.data.num)) {
-      this.teamNums.push(e.detail.data.num);
+        this.teamNums.push(e.detail.data.num);
         this.resMap[e.detail.data.num] = [];
       }
       // append the response object to the response map
@@ -130,7 +171,33 @@
         name: e.detail.data.name,
         responses: e.detail.data.res,
       });
+
+      // if online, send the response to database
+      if (this.isOnline) {
+        this.submitRes(
+          e.detail.data.name,
+          e.detail.data.num,
+          e.detail.data.res
+        );
+      }
+      // otherwise save in list for later
+      else {
+        this.unsavedRes.push(e.detail.data);
+      }
       notify(`Response from ${e.detail.data.name} was recorded`, "is-success");
+    },
+    submitRes(name, teamNum, responses) {
+      fetch("/api/respond/" + this.code, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify({
+          teamNum: teamNum,
+          name: name,
+          responses: responses,
+        }),
+      }).then((res) => checkOk(res));
     },
   });
 
@@ -140,7 +207,7 @@
       { fps: 10, qrbox: { width: 250, height: 250 } },
       /* verbose= */ false
     ),
-    lastScanTime : Date.now(),
+    lastScanTime: Date.now(),
     open() {
       this.scanner.render(this.scan, () => {});
     },

@@ -117,3 +117,10 @@ hr.title-hr {
 .animated {
   transform: translateY(0px);
 }
+
+.image-select-dot {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background-color: yellow;
+}

@@ -130,7 +130,6 @@ def get_forms():
     return {"forms": forms}
 
 @bp.route("/respond/<code>", methods=["POST"])
-@limiter.limit("30/minute")
 def respond(code):
     form = Form.query.filter_by(code=code).first_or_404()
     response = request.json["responses"]
@@ -147,6 +146,7 @@ def respond(code):
     db.session.commit()
 
     return {'status' : 200}
+
 
 @bp.route("/getteamnums/<code>")
 @limiter.limit("15/sec;80/minute")

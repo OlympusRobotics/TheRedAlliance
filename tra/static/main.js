@@ -94,6 +94,39 @@ async function checkOk(res) {
     return await res.json() 
 }
 
+//--------- components
+// the original dimensions of the field image
+const FIELD_X = 773;
+const FIELD_Y = 342;
+
+// uses in form.html only
+const ImageSelectPublic = (index) => ({
+  img : null,
+  dot: {
+    x : 0,
+    y : 0
+  },
+  // coords of image
+  coords: {
+    x : 0,
+    y : 0,
+  },
+  setDot(e) {
+    // get pos relative to 0,0 on the image
+    this.dot.x = parseInt(e.pageX - this.coords.x);
+    this.dot.y = parseInt(e.pageY - this.coords.y);
+    this.$store.responses[index] = [this.dot.x, this.dot.y];
+  },
+});
+// get pos of element
+const getPos = (el) => {
+    const rect = el.getBoundingClientRect();
+    return {
+      x : window.scrollX + rect.left,
+      y : window.scrollY + rect.top
+    }
+  }
+
 // ---------- Straight from Bulma website https://bulma.io/documentation/components/navbar/
 // controls the navbar burger
 document.addEventListener("DOMContentLoaded", () => {
