@@ -16,7 +16,7 @@
   </div>
 
   <div class="columns is-mobile is-centered">
-    <div class="column is-two-thirds mx-5">
+    <div class="column is-two-thirds-desktop is-full-mobile ">
       <template x-for="teamNum in teamNums">
         <div x-data="{show:false}" class="my-4">
           <div
@@ -62,19 +62,21 @@
                   <template
                     x-if="PropertyTypes.ImageSelect.equals(q.components[1].type)"
                   >
-                    <div x-data="{ coords: { x : 0, y : 0 } }">
+                    <div x-data="ImageSelect()">
                       <img
                         x-init="img = $el"
-                        src="/static/assets/field.jpg"
+                        :src="getFieldImage()"
                         class="image mt-3 mx-3"
                         style="width: fit-content"
                       />
-                      <template x-for="res in resMap[teamNum]">
-                        <div
-                          x-tooltip="res.name"
-                          class="image-select-dot"
-                          :style="{ left: res.responses[i][0] + coords.x + 'px', top: res.responses[i][1] + coords.y + 'px'}"
-                        ></div>
+                      <template x-if="size !== null">
+                        <template x-for="res in resMap[teamNum]">
+                          <div
+                            x-tooltip="res.name"
+                            class="image-select-dot"
+                            :style="{ left: scaleCoords(res.responses[i]).x + 'px', top: scaleCoords(res.responses[i]).y + 'px'}"
+                          ></div>
+                        </template>
                       </template>
                     </div>
                   </template>
@@ -99,6 +101,8 @@
     title: "",
     code: "",
     async init() {
+      // call once to get the image in memory
+      getFieldImage()
       await this.getForm();
       await this.getNums();
       // watch the unsaved responses and save them to localstorage

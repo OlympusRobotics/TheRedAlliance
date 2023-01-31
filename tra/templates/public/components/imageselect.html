@@ -1,4 +1,4 @@
 <div x-data="ImageSelectPublic(index)" class="mt-2 mx-2">
-    <img x-init="coords = getPos($el)" @click="setDot" src="/static/assets/field.jpg" class="image" style="width:fit-content">
+    <img x-init="img = $el" @click="setDot" src="/static/assets/field.jpg" class="image" style="width:fit-content">
     <div class="image-select-dot" :style="{ left: dot.x + coords.x + 'px', top: dot.y + coords.y + 'px'}"></div>
 </div>

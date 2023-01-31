@@ -15,10 +15,11 @@ def authorized(session, abort_on_fail=True) -> Admin:
         abort(403)
     admin = Admin.query.filter_by(key=session["admin"]).first()
     if admin is None and abort_on_fail:
+        print("aborting here")
         abort(403)
     return admin
 
-def set_key(admin, session, db) -> None:
+def set_key(admin, session) -> None:
     session["admin"] = admin.key
 
 

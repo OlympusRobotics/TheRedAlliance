@@ -49,7 +49,7 @@ def admin_login():
             ):
                 # set the session to the key of the admin. This is what is used to check the
                 # validity of the admin session
-                set_key(admin, session, db)
+                set_key(admin, session)
                 return redirect(url_for("admin.admin_page"))
 
         flash("Invalid Admin Login Credentials", "is-danger")
@@ -73,7 +73,7 @@ def register():
         db.session.add(admin)
         db.session.commit()
         # log the user in
-        set_key(admin, session, db)
+        set_key(admin, session)
         flash("Account created", "is-success")
         return redirect(url_for("admin.admin_page"))
 
