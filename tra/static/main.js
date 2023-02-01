@@ -31,7 +31,7 @@ class PropertyTypes extends Enum {
     [
       PropertyTypes.Prompt.toString(),
       {
-        text: "Question Prompt - Click to Edit",
+        text: "Click to Edit",
       },
     ],
     [
@@ -125,9 +125,9 @@ const ImageSelect = () => ({
       x: (this.size.x / FIELD_X) * point[0] + this.coords.x,
       y: (this.size.y / FIELD_Y) * point[1] + this.coords.y,
     };
-    return scaled;
-  },
-});
+    return scaled;},
+
+  });
 
 // uses in form.html only
 const ImageSelectPublic = (index) => ({
@@ -158,8 +158,8 @@ const ImageSelectPublic = (index) => ({
   },
   setDot(e) {
     // get pos relative to 0,0 on the image
-    this.dot.x = parseInt(e.pageX - this.coords.x);
-    this.dot.y = parseInt(e.pageY - this.coords.y);
+    this.dot.x = parseInt(e.pageX - this.coords.x - 4);
+    this.dot.y = parseInt(e.pageY - this.coords.y - 4);
     var scaled = this.scaleCoords(this.dot);
     this.$store.responses[index] = [scaled.x, scaled.y];
   },
@@ -179,6 +179,7 @@ const getPos = (el) => {
   };
 };
 
+// loads the img into a data url so that it can be used in offline mode
 const getFieldImage = async () => {
   if (this.dataUrl) {
     return this.dataUrl;

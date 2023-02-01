@@ -72,6 +72,7 @@
                       <template x-if="size !== null">
                         <template x-for="res in resMap[teamNum]">
                           <div
+                            x-data=""
                             x-tooltip="res.name"
                             class="image-select-dot"
                             :style="{ left: scaleCoords(res.responses[i]).x + 'px', top: scaleCoords(res.responses[i]).y + 'px'}"
