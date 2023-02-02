@@ -1,96 +1,126 @@
+[x-cloak] {
+  display: none !important;
+}
+
 /* admin page header */
 h1.title {
-    margin-top: 3.5rem;
-    margin-left: 12%;
+  margin-top: 3.5rem;
+  margin-left: 10%;
 }
 
 hr.title-hr {
-    margin-bottom: 5.5rem;
-    margin-left: 10%;
-    width: 50%;
-    border: 4px solid #9A3334;
-    border-radius: 6px;
+  margin-bottom: 5.5rem;
+  margin-left: 10%;
+  width: 50%;
+  border: 4px solid #9a3334;
+  border-radius: 6px;
 }
 
 #form-feedback {
-    color: firebrick;
-    font-weight: bold;
-    margin-top: 10px;
-    margin-bottom: 10px;
+  color: firebrick;
+  font-weight: bold;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.question-card {
+    border-radius: 10px;
 }
 
 .notification {
-    max-width: 25em;
+  max-width: 25em;
 }
-
-.scout-card {
-    display: flex;
-    justify-content: space-between;
-    background-color: rgb(250, 250, 250);
-    padding: 1.5em;
-    margin-bottom: 1.5em;
-    border-radius: 10px;
-    font-size: 1.2em;
-    transition: ease 0.1s; 
-}
-
-.scout-card:hover {
-    zoom: 1.02; 
-    -moz-transform: scale(1.02);
-}
-
-.scout-card .name{
-    font-size: larger;
-    font-weight: bold;
-}
-
-.scout-card div {
-    display: inline-block;
-}
-
-
-.add-scout-panel {
-    display: flex;
-    justify-content: space-between;
-    background-color: rgb(250, 250, 250);
-    padding: 1.5em;
-    margin-top: 0.5em;
-    border-radius: 10px;
-    font-size: 1.2em;
-    transition: ease 0.2s; 
-}
-
-.add-scout-panel:hover {
-    zoom: 1.05; 
-    -moz-transform: scale(1.05);
-}
-
-.add-scout-panel input {
-    width: 40%;
-}
-.add-scout-panel div {
-    display: inline-block;
-}
-
-.progress {
-    width: 60rem !important;
+.noti-content {
+  position: fixed !important;
+  vertical-align: top;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+  overflow: hidden;
+  transition: all 0.2s;
+  z-index: 31;
+  transform: translateY(-100px);
 }
 
 .form-card {
-    display: flex;
-    justify-content: space-between;
-    background-color: rgb(250, 250, 250);
-    padding: 1.5em;
-    margin-bottom: 1.5em;
-    border-radius: 10px;
-    font-size: 1.2em;
-    transition: ease 0.1s; 
+  display: flex;
+  justify-content: space-between;
+  background-color: rgb(243, 243, 243);
+  padding: 1.5em;
+  margin-bottom: 1.5em;
+  border-radius: 10px;
+  font-size: 1.2em;
+  transition: ease 0.3s;
 }
+
+
 
 .form-card:hover {
-    zoom: 1.02; 
-    -moz-transform: scale(1.02);
+  border-radius: 20px;
+  -webkit-transform: scale(0.98);
+  -moz-transform: scale(0.98);
+  -ms-transform: scale(0.98);
+  transform: scale(0.98);
+}
+
+.form-card .name {
+  font-size: larger;
+  font-weight: bold;
+}
+
+@media screen and (max-width: 800px) {
+  .form-card {
+    margin: 0.5rem 1rem;
+    display: block;
+  }
+  .form-card .buttons {
+    margin-top: 1.3rem;
+  }
+}
+
+.add-scout-panel {
+  display: flex;
+  justify-content: space-between;
+  background-color: rgb(250, 250, 250);
+  padding: 1.5em;
+  margin-top: 0.5em;
+  border-radius: 10px;
+  font-size: 1.2em;
+  transition: ease 0.2s;
+}
+
+.add-scout-panel:hover {
+  zoom: 1.05;
+  -moz-transform: scale(1.05);
+}
+
+.add-scout-panel input {
+  width: 40%;
+}
+.add-scout-panel div {
+  display: inline-block;
+}
+
+.progress {
+  width: 60rem !important;
 }
 
 
-  
+@media screen and (max-width: 700px) {
+  .noti-content {
+    width: 90%;
+  }
+}
+
+.animated {
+  transform: translateY(0px);
+}
+
+.image-select-dot {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background-color: yellow;
+}

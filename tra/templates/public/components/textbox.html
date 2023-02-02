@@ -1,11 +1,9 @@
 <!--Requires a question and comp object-->
-
 <div class="mt-3">
     <textarea
-    readonly
     class="textarea"
-    :id="$id('text-input')"
+    x-model="$store.responses[index]"
     :placeholder="comp.placeholder"
-    style="resize: none; min-height:auto; height: 4rem;"
+    style="resize: none; min-height:auto; height: 3rem;"
     ></textarea>
 </div>

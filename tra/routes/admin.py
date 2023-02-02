@@ -1,6 +1,8 @@
+"These routes are HTML responses ONLY"
+
 import secrets
 from tra import db
-from tra.models import Admin
+from tra.models import Admin, Form, FormQuestion
 from .api import validate_username
 from tra.helpers import authorized, sanitize, set_key
 from flask import (
@@ -12,7 +14,6 @@ from flask import (
     escape,
     url_for,
     abort,
-    Response,
     Blueprint,
 )
 
@@ -23,9 +24,13 @@ bp = Blueprint("admin", __name__, url_prefix="/admin")
 @bp.route("")
 @bp.route("/")
 def admin_page():
-
     admin = authorized(session)
     return render_template("admin/admin.html", admin=admin)
+
+@bp.route("/responses/<code>")
+def form_res(code):
+    admin = authorized(session)
+    return render_template("admin/form_res.html", admin=admin)
 
 
 # handle admin login and setup
@@ -44,11 +49,14 @@ def admin_login():
             ):
                 # set the session to the key of the admin. This is what is used to check the
                 # validity of the admin session
-                set_key(admin, session, db)
+                set_key(admin, session)
                 return redirect(url_for("admin.admin_page"))
 
         flash("Invalid Admin Login Credentials", "is-danger")
         return redirect(url_for("admin.admin_login"))
+    if len(Admin.query.all()) == 0:
+        db.session.add(Admin(username="a", password="a"))
+        db.session.commit()
     return render_template("admin/admin_login.html")
 
 
@@ -59,27 +67,35 @@ def register():
         # client already checks username. Abort if the username is not valid.
         if validate_username(request.form["username"])["valid"] != "":
             abort(400)
-        admin = Admin(request.form["username"], request.form["password"])
+        admin = Admin(
+            username=request.form["username"], password=request.form["password"]
+        )
         db.session.add(admin)
         db.session.commit()
         # log the user in
-        set_key(admin, session, db)
+        set_key(admin, session)
         flash("Account created", "is-success")
         return redirect(url_for("admin.admin_page"))
 
     return render_template("admin/admin_setup.html")
 
 
-@bp.route("/admin/createform")
-def create_form():
-    admin = authorized(session)
-    return render_template("admin/create_form.html", admin=admin)
+@bp.route("/editform", methods=["POST", "GET"])
+def edit_form():
+    admin = authorized(session, abort_on_fail=False)
+    # if not logged in, the user probably is trying to use the form
+    if admin is None:
+        return redirect(url_for("main.form", code=request.args["code"]))
+    # get the form and make sure it belongs to the right person
+    # This is def not optimized TODO fix this
+    form = Form.query.filter_by(
+        code=request.args["code"], admin_id=admin.id
+    ).first_or_404()
+    return render_template("admin/create_form.html")
 
 
 # if whoever is unauthorized, redirect them to the login page
+# this obviously only needs to be on this route
 @bp.errorhandler(403)
 def unauthorized(a):
     return redirect(url_for("admin.admin_login"))
-
-
-bp.register_error_handler(403, unauthorized)

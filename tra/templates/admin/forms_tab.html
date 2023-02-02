@@ -1,26 +1,82 @@
 {# shows all the user's forms #}
 <div class="container">
-    <div class="columns is-centered">
-        <div class="column">
-            <div class="form-card is-flex is-justify-content-center">
-                <div>
-                    <a class="button is-primary is-large" href="{{ url_for('admin.create_form') }}">Create New Form +</a>
-                </div>
-            </div>
-            {% for form in forms %}
-                <div class="form-card">
-                    <div style="align-items: center;">
-                        {{ form.name }}
-                    </div>
-                </div> 
-            {% endfor %}
+  <div class="columns is-mobile is-centered">
+    <div class="column">
+      <div class="form-card is-flex is-justify-content-center">
+        <div>
+          <a class="button is-primary is-large" @click="createForm()"
+            >Create New Form +</a
+          >
         </div>
-
+      </div>
+      <template x-data="getForms()" x-for="form in forms">
+        <div class="form-card">
+          <div x-text="form.name" class="name"></div>
+          <div class="buttons">
+            <button
+              @click="() => {
+                navigator.clipboard.writeText(location.origin + '/' + form.code);
+                $tooltip('Link Copied!', {  arrow: false});
+            }"
+              title="Copy Form Link"
+              class="button is-light"
+            >
+              <i class="fa-solid fa-link"></i>
+            </button>
+            <a
+              :href="'/admin/editform?code=' + form.code"
+              class="button is-primary"
+              >Edit Form</a
+            >
+            <a class="button is-primary" :href="'/admin/responses/' + form.code">Offline Mode</a>
+            <a
+              @click="deleteForm(form.code)"
+              class="button is-outlined is-danger"
+              >Delete</a
+            >
+          </div>
+        </div>
+      </template>
     </div>
+  </div>
 </div>
 
 <script>
+  function getForms() {
+    return {
+      forms: [],
+      init() {
+        this.updateForms();
+      },
+      updateForms() {
+        // get all the forms associated with this account
+        fetch("/api/getforms", {
+          credentials: "same-origin",
+        })
+          .then((req) => checkOk(req))
+          .then((req) => (this.forms = req.forms));
+      },
+      deleteForm(code) {
+        // delete form then update form list
+        fetch("/api/deleteform/" + code)
+          .then((req) => checkOk(req))
+          .then((req) => {
+            notify("Form Deleted", "is-success");
+            this.updateForms();
+          });
+      },
+    };
+  }
 
-
-    
+  function createForm() {
+    fetch("/api/createform", {
+      credentials: "same-origin",
+    })
+      // get the code then redirect
+      .then((req) => {
+        checkOk(req).then((req) => {
+          location.href = location.origin + "/admin/editform?code=" + req.code;
+        });
+      });
+  }
 </script>

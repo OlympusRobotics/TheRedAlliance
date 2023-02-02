@@ -1,3 +1,19 @@
 #!/bin/bash
-pip install -r requirments.txt
+
+cd tra/static
+npm install --silent
+echo "NPM packages installed"
+if [ ! -d "bulmajs" ]; then
+    echo "Installing BulmaJs"
+    wget https://github.com/VizuaaLOG/BulmaJS/archive/refs/tags/0.12.2.zip -O bulmajs.zip
+    unzip bulmajs.zip
+    mv BulmaJS-0.12.2 bulmajs
+    rm bulmajs.zip
+    echo "Installed"
+else
+    echo "BulmaJS already installed!!!!!!!!!!!!!!!!!!!!!!!!"
+fi
+cd  ../..
+pip install -r requirments.txt --quiet
+echo "Installed Python requirments from requirments.txt"
 python3 -m tra

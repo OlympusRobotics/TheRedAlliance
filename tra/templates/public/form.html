@@ -1,0 +1,161 @@
+{% extends 'base.html' %} {% block content %}
+
+<div x-data="formRender()">
+  <h1 class="title is-3" x-text="title"></h1>
+  <hr class="title-hr" />
+  <div class="columns is-centered">
+    <div class="column is-two-thirds mx-4">
+      <!--QUESTIONS-->
+      <section x-show="!showQRCode" class="box">
+        <div class="mb-2">
+          <label class="is-medium label">Name</label> 
+          <input x-model="name" class="input" placeholder="Jason Quang">
+        </div>
+        <div class="mb-6">
+          <label class="is-medium label">Current Scouting Team Number</label> 
+          <input x-model="teamNum" class="input" x-mask="9999999" placeholder="4982">
+        </div>
+        <hr>
+        <template x-for="(question, index) in questions">
+          <div class="">
+            <template x-for="comp in question.components">
+              <div class="">
+                <!--If it is a prompt-->
+                <template x-if="PropertyTypes.Prompt.equals(comp.type)">
+                  {% include 'public/components/prompt.html' %}
+                </template>
+                <!--If it is a textbox-->
+                <template x-if="PropertyTypes.TextBox.equals(comp.type)">
+                  {% include 'public/components/textbox.html' %}
+                </template>
+                <template x-if="PropertyTypes.ImageSelect.equals(comp.type)">
+                  {% include 'public/components/imageselect.html' %}
+                </template>
+              </div>
+            </template>
+            <hr />
+          </div>
+        </template>
+        <button @click="genQRCode()" class="button is-primary" :disabled="name.length == 0 || teamNum.length == 0">
+          Generate QR Code
+        </button>
+      </section>
+      <!-- QR Code and submission -->
+      <section x-show="showQRCode" class="box" style="text-align: center">
+        <div style="margin: auto">
+          <img :src="qrcode" />
+          <br />
+          <span class="title is-4">Scan To Submit Response</span>
+          <br />
+          <button @click="submitRes()" :disabled="!isOnline" class="button is-success mt-4">
+            Submit to Cloud
+          </button>
+          <br />
+          <button
+            @click="() => {
+                        showQRCode = !showQRCode;
+                        resetRes();
+                    }"
+            class="button is-primary mt-4"
+          >
+            Create New Response
+          </button>
+          <br />
+          <button @click="showQRCode = !showQRCode" class="button is-link mt-4">
+            Change Response
+          </button>
+          <br />
+          <button @click="downloadQRCode()" class="button is-info mt-4">
+            <span class="icon">
+              <i class="fa-solid fa-download"></i>
+            </span>
+          </button>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script>
+  function formRender() {
+    return {
+      title: "",
+      name: "",
+      teamNum: "",
+      isOnline: true,
+      code: null,
+      questions: null,
+      showQRCode: false,
+      qrcode: "",
+      async init() {
+        
+        await this.getForm();
+        // if connected or disconnected, update isOnline accordingly
+        window.addEventListener("offline", () => {
+          this.isOnline = false;
+        });
+        window.addEventListener("online", () => {
+          this.isOnline = true;
+        });
+      },
+      submitRes() {
+        fetch("/api/respond/" + this.code, {
+          headers : {
+              'Content-Type' : 'application/json'
+          },
+          method: "POST",
+          body: JSON.stringify({teamNum: this.teamNum, name: this.name, responses : this.$store.responses}),
+        })
+          .then((res) => checkOk(res))
+          .then((res) => {
+            notify("Response Recorded", "is-success");
+            this.showQRCode = !this.showQRCode;
+            this.resetRes();
+          });
+      },
+      async getForm() {
+        fetch("/api/getform/" + location.href.split("/")[3])
+          .then((res) => checkOk(res))
+          .then((res) => {
+            this.questions = res.questions;
+            this.title = res.name;
+            this.code = res.code;
+            this.resetRes();
+          });
+      },
+      genQRCode() {
+        // why is js like this i wanna die
+        var out;
+        QRCode.toDataURL(
+          JSON.stringify(
+            {
+              name: this.name,
+              num: parseInt(this.teamNum),
+              res: this.$store.responses
+            }
+          ),
+          { version: 13 },
+          function (err, url) {
+            out = url;
+          }
+        );
+        this.qrcode = out;
+        this.showQRCode = true;
+      },
+      downloadQRCode() {
+        const link = document.createElement("a");
+        link.href = this.qrcode;
+        link.download = `${this.title}-${this.code}-qrcode`;
+        link.click();
+      },
+      resetRes() {
+        this.teamNum = "";
+        // init empty response list.
+        Alpine.store("responses", Array(this.questions.length).fill(""));
+      },
+    };
+  }
+</script>
+
+<script src="/static/node_modules/qrcode/build/qrcode.js"></script>
+{% endblock %}

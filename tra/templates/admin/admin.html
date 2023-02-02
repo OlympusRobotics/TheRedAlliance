@@ -3,17 +3,15 @@
 {% block content %}
 
 <h1 class="title is-2">Admin Dashboard</h1>
+<h1 class="title is-5">{{admin.username}}</h1>
 <hr class="title-hr">
-<div class="container mb-4">
-    {% include 'notification.html'%}
-</div>
 <div x-data="tabsManager()"> 
     <div id="dash-tabs" class="container">
         <div class="tabs is-large">
             <ul>
                 <li @click="show(0)" id="forms" :class="{ 'is-active' : states[0] }"><a>Forms</a></li>
-                <li @click="show(1)" id="data":class="{ 'is-active' : states[1] }"><a>Data</a></li>
-                <li @click="show(2)" id="settings" :class="{ 'is-active' : states[2] }"><a>Settings</a></li>
+                <!-- <li @click="show(1)" id="data":class="{ 'is-active' : states[1] }"><a>Data</a></li>
+                <li @click="show(2)" id="settings" :class="{ 'is-active' : states[2] }"><a>Settings</a></li> -->
             </ul>
         </div>
 

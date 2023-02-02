@@ -7,7 +7,6 @@
     Admin Setup 
     <hr>
   </div>
-  {% include 'notification.html' %}
   <div class="hero-body">
     <div class="container animate__animated animate__fadeInUp">
       <div class="columns is-centered">
@@ -16,7 +15,7 @@
             <div class="field">
               <label for="" class="label">Email</label>
               <div class="control has-icons-left">
-                <input @blur="validateUsername" @input.debounce="validateUsername" x-model="username" id="username" name="username" type="name" placeholder="Jason Quang"
+                <input @blur="validateUsername" @input.debounce.750ms="validateUsername" x-model="username" id="username" name="username" type="name" placeholder="Jason Quang"
                   class="input" required>
                 <span class="icon is-small is-left">
                   <i class="fa fa-envelope"></i>
@@ -83,9 +82,8 @@ function registerForm() {
             return;
           }
           fetch(`${window.location.origin}/api/admin/is_username_valid?username=${this.username}`)
-          .then(res => res.json())
+          .then(res => checkOk(res))
           .then(res => {
-            console.log(res)
             this.formFeedback = res.valid;
             if (res.valid === "") {
               this.unValidated = true; //the UN is valid

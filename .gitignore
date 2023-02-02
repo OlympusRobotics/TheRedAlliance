@@ -259,4 +259,5 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
-*.sqlite3
+bulmajs/
+data.sqlite3

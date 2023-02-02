@@ -1,20 +1,56 @@
 <!--Header file with imports + title-->
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    {% if title %}
-        <title>{{title}} - The Red Alliance</title>
-    {% else %}
-        <title>The Red Alliance</title>
-    {% endif %}
-    <!--CSS Styles. Bulma, Animate.css, and custom-->
-    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/bulma/css/bulma.css')}}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-    <!--Alpine JS-->
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <!--Main js file-->
-    <script src="{{ url_for('static', filename='main.js') }}"></script>
-</head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=760, initial-scale=1" />
+  {% if title %}
+  <title>{{title}} - The Red Alliance</title>
+  {% else %}
+  <title>The Red Alliance</title>
+  <template></template>
+  {% endif %}
+  <!--CSS Styles. Bulma, Animate.css, and custom-->
+  <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}" />
+  <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='node_modules/bulma/css/bulma.css')}}"
+  />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+  />
 
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz@20..48"
+  />
+  <!-- alpine tooltip -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/@ryangjchandler/alpine-tooltip@1.x.x/dist/cdn.min.js"
+    defer
+  ></script>
+  <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css" />
+  <!-- Alpine Mask Plugin -->
+  <script defer src="https://unpkg.com/@alpinejs/mask@3.x.x/dist/cdn.min.js"></script>
+
+  <!--Alpine JS-->
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <!-- Bulma js plugins  -->
+  <script src="/static/bulmajs/dist/alert.js"></script>
+  <!-- FA Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!--Main js file-->
+  <script src="{{ url_for('static', filename='main.js') }}"></script>
+  <script>
+    // min sitewidth
+    var siteWidth = 550;
+    var scale = screen.width / siteWidth;
+    // set initial scale dynamiclly
+    document
+      .querySelector('meta[name="viewport"]')
+      .setAttribute(
+        "content",
+        "width=" + siteWidth + ", initial-scale=" + scale + ""
+      );
+  </script>
+</head>

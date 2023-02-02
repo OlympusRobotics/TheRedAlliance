@@ -3,6 +3,9 @@ class Enum {
   constructor(name) {
     this.name = name;
   }
+  /**
+   * @param {Object} a - Object containing name property
+   */
   equals(a) {
     return this.name === a.name;
   }
@@ -16,27 +19,180 @@ class Enum {
 class QuestionTypes extends Enum {
   static TextBox = new QuestionTypes("TextBox");
   static MultipleChoice = new QuestionTypes("MultipleChoice");
+  static ImageSelect = new QuestionTypes("ImageSelect");
 }
 
 class PropertyTypes extends Enum {
   static Prompt = new PropertyTypes("Prompt");
   static TextBox = new PropertyTypes("TextBox");
+  static ImageSelect = new PropertyTypes("ImageSelect");
   // contains all the properties for each of the property types
   static templates = new Map([
     [
       PropertyTypes.Prompt.toString(),
       {
-        text: "Question Prompt - Click to Edit",
+        text: "Click to Edit",
       },
     ],
     [
       PropertyTypes.TextBox.toString(),
       {
-        placeholder: "",
+        placeholder: "Enter response",
+      },
+    ],
+    [
+      PropertyTypes.ImageSelect.toString(),
+      {
+        selected: [0, 0], // coordinates of the selected point
       },
     ],
   ]);
 }
+
+function notificationHandler() {
+  return {
+    type: "is-success",
+    text: "test",
+    animated: false,
+    async init() {
+      await this.$nextTick();
+    },
+    async updateNoti(e) {
+      this.type = e.detail.cat;
+      this.text = e.detail.msg;
+      this.animated = true;
+      await new Promise((r) => setTimeout(r, e.detail.timeout));
+      this.animated = false;
+    },
+  };
+}
+
+// creates a notification
+function notify(msg, cat, timeout = 1500) {
+  window.dispatchEvent(
+    // notify what went wrong
+    new CustomEvent("notify", {
+      detail: {
+        msg: msg,
+        cat: cat,
+        timeout: timeout,
+      },
+    })
+  );
+  console.log("Notify called");
+}
+
+// checks if the request is ok then converts to json
+async function checkOk(res) {
+  if (!res.ok) {
+    res = await res.json();
+    notify(res.error, "is-danger");
+    throw Error("Something went wrong");
+  }
+  return await res.json();
+}
+
+//--------- components
+// the original dimensions of the field image
+const FIELD_X = 773;
+const FIELD_Y = 342;
+
+const ImageSelect = () => ({
+  img: null,
+  // size used to scale coordinates
+  size: null,
+  // coords of image
+  coords: {
+    x: 0,
+    y: 0,
+  },
+  init() {
+    this.$watch("img", () => {
+      if (this.img != null) {
+        // when the img is loaded, get the width and height to scale te coord
+        this.img.onload = () => {
+          this.coords = getPos(this.img);
+          this.size = {
+            x: this.img.width,
+            y: this.img.height,
+          };
+        };
+      }
+    });
+  },
+  scaleCoords(point) {
+    var scaled = {
+      x: (this.size.x / FIELD_X) * point[0] + this.coords.x,
+      y: (this.size.y / FIELD_Y) * point[1] + this.coords.y,
+    };
+    return scaled;},
+
+  });
+
+// uses in form.html only
+const ImageSelectPublic = (index) => ({
+  img: null,
+  size: null,
+  dot: {
+    x: 0,
+    y: 0,
+  },
+  // coords of image
+  coords: {
+    x: 0,
+    y: 0,
+  },
+  init() {
+    this.$watch("img", () => {
+      if (this.img != null) {
+        // when the img is loaded, get the width and height to scale te coord
+        this.img.onload = () => {
+          this.coords = getPos(this.img);
+          this.size = {
+            x: this.img.width,
+            y: this.img.height,
+          };
+        };
+      }
+    });
+  },
+  setDot(e) {
+    // get pos relative to 0,0 on the image
+    this.dot.x = parseInt(e.pageX - this.coords.x - 4);
+    this.dot.y = parseInt(e.pageY - this.coords.y - 4);
+    var scaled = this.scaleCoords(this.dot);
+    this.$store.responses[index] = [scaled.x, scaled.y];
+  },
+  // scales up to original size
+  scaleCoords(dot) {
+    return {
+      x: parseInt((FIELD_X / this.size.x) * dot.x),
+      y: parseInt((FIELD_Y / this.size.y) * dot.y),
+    };
+  },
+});
+const getPos = (el) => {
+  const rect = el.getBoundingClientRect();
+  return {
+    x: window.scrollX + rect.left,
+    y: window.scrollY + rect.top,
+  };
+};
+
+// loads the img into a data url so that it can be used in offline mode
+const getFieldImage = async () => {
+  if (this.dataUrl) {
+    return this.dataUrl;
+  }
+  var blob = await fetch("/static/assets/field.jpg").then((r) => r.blob());
+  var dataUrl = await new Promise((resolve) => {
+    let reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.readAsDataURL(blob);
+  });
+  this.dataUrl = dataUrl;
+  return this.dataUrl;
+};
 
 // ---------- Straight from Bulma website https://bulma.io/documentation/components/navbar/
 // controls the navbar burger

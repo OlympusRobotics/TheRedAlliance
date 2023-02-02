@@ -1,32 +1,59 @@
 <!DOCTYPE html>
 <html>
+  {% include 'header.html' %}
 
-{% include 'header.html' %}
-
-<body>
-    <header>
-        <nav class="navbar is-danger is-spaced has-shadow" style="font-size: 1.1rem; background-color: #9A3334;" role="navigation" aria-label="main navigation">
-            <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
-                <span aria-hidden="true"></span>
-                <span aria-hidden="true"></span>
-                <span aria-hidden="true"></span>
-            </a>
-            <div id="main-menu" class="navbar-menu">
-                <div class="navbar-start">
-                    <a class="navbar-item" href="{{ url_for('main.home') if not session['admin'] else url_for('admin.admin_page')}}" style="font-size: 1.5rem;">
-                        The Red Alliance
-                    </a>
-                    {% if admin %}
-                        <a href="{{ url_for('main.logout') }}" class="navbar-item">  
-                            Logout
-                        </a>
-                    {% endif %}
-                </div>
+  <body>
+    <div style="display: relative">
+      <div
+        x-data="notificationHandler()"
+        class="notification noti-content"
+        @notify.window="updateNoti($event)"
+        :class="{ [type] : true, 'animated' : animated }"
+      >
+        <span x-text="text"></span>
+      </div>
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %} {% for category, message in messages %}
+      <notify x-data x-init="notify('{{ message }}', '{{category}}')"></notify>
+      {% endfor %} {% endif %} {% endwith %}
+      <header>
+        <nav
+          class="navbar is-danger is-spaced has-shadow"
+          style="font-size: 1.1rem; background-color: #9a3334"
+          role="navigation"
+          aria-label="main navigation"
+        >
+          <a
+            role="button"
+            class="navbar-burger"
+            aria-label="menu"
+            aria-expanded="false"
+          >
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+          </a>
+          <div id="main-menu" class="navbar-menu">
+            <div class="navbar-start">
+              <a
+                class="navbar-item"
+                href="/admin"
+                style="font-size: 1.5rem"
+              >
+                The Red Alliance
+              </a>
+              {% if admin %}
+              <a href="{{ url_for('main.logout') }}" class="navbar-item">
+                Logout
+              </a>
+              {% endif %}
             </div>
+          </div>
         </nav>
-        
-    </header>
-    {% block content %}{% endblock %}
-</div>
-</body>
+      </header>
+    </div>
+    <div x-data x-cloak>
+      {% block content %}{% endblock %}
+    </div>
+  </body>
 </html>
