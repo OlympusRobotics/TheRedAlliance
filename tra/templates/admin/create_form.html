@@ -65,6 +65,9 @@
                     <template x-if="PropertyTypes.TextBox.equals(comp.type)">
                       {% include 'properties/textbox.html' %}
                     </template>
+                    <template x-if="PropertyTypes.NumInp.equals(comp.type)">
+                      {% include 'properties/number-inp.html' %}
+                    </template>
                     <!--If it is an image select -->
                     <template
                       x-if="PropertyTypes.ImageSelect.equals(comp.type)"
@@ -96,6 +99,7 @@
       <div class="buttons are-medium mt-4 is-flex is-justify-content-center">
           <button @click="createQuestion(QuestionTypes.TextBox)" class="button is-primary">Textbox</button>
           <button @click="createQuestion(QuestionTypes.ImageSelect)" class="button is-primary">Field Select</button>
+          <button @click="createQuestion(QuestionTypes.NumInp)" class="button is-primary">Number</button>
           <button @click="addQuestion = false" class="button is-danger is-outlined">X</button>
       </div>
     </div>
@@ -232,8 +236,13 @@
     else if (QuestionTypes.ImageSelect.equals(type)) {
       out.push(questionComponent(PropertyTypes.Prompt));
       out.push(questionComponent(PropertyTypes.ImageSelect));
-    } else {
-      console.log("Bruh what kind of question is this? " + type);
+    } 
+    else if (QuestionTypes.NumInp.equals(type)) {
+      out.push(questionComponent(PropertyTypes.Prompt));
+      out.push(questionComponent(PropertyTypes.NumInp));
+    }
+    else {
+      console.warn("Bruh what kind of question is this? " + type);
     }
     return out;
   }

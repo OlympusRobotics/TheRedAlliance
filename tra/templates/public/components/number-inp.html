@@ -1,0 +1,15 @@
+<div x-data="NumInp(comp.min, comp.max, index)" class="columns is-vcentered is-centered is-mobile">
+  <div class="column is-narrow">
+    <button @click="val--;" class="button"><i class="icon">-</i></button>
+  </div>
+  <div class="column is-narrow">
+    <input
+      class="input is-large is-rounded num-inp"
+      x-model="val"
+      :placeholder="comp.min"
+    />
+  </div>
+  <div class="column is-narrow">
+    <button @click="val++;" class="button"><i class="icon">+</i></button>
+  </div>
+</div>

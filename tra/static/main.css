@@ -124,3 +124,9 @@ hr.title-hr {
   height: 10px;
   background-color: yellow;
 }
+
+.num-inp {
+  font-size: 2rem !important;
+  width: 8rem !important;
+  text-align: center;
+}

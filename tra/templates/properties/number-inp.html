@@ -1,0 +1,34 @@
+<div>
+  <div class="columns is-vcentered is-centered is-mobile">
+    <div class="column is-narrow">
+      <button class="button"><i class="icon">-</i></button>
+    </div>
+    <div class="column is-narrow">
+      <input class="input is-large is-rounded num-inp" placeholder="0" />
+    </div>
+    <div class="column is-narrow">
+      <button class="button"><i class="icon">+</i></button>
+    </div>
+  </div>
+  <div>
+<div x-data="{error : false}" x-init="() => {
+  // validate the min and max params
+  $watch('comp.min', (v) => {
+    if (parseInt(v) >= comp.max) {error=true;}
+    else {error=false;}
+  });
+  $watch('comp.max', (v) => {
+    if (parseInt(v) <= comp.min) {error=true;}
+    else {error=false;}
+  })
+}">
+    <span>
+        <label class="mx-3">Min</label>
+        <input x-model="comp.min" x-mask="9999" :class="{'is-danger' : error}" class="input is-small" style="width:4rem" type="text" placeholder="0" />
+    </span>
+    <span>
+    <label class="mx-3">Max</label>
+    <input x-model="comp.max" x-mask="9999" :class="{'is-danger' : error}" class="input is-small" style="width:4rem" type="text" placeholder="0" />
+
+    </span>
+</div>

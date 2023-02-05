@@ -20,12 +20,14 @@ class QuestionTypes extends Enum {
   static TextBox = new QuestionTypes("TextBox");
   static MultipleChoice = new QuestionTypes("MultipleChoice");
   static ImageSelect = new QuestionTypes("ImageSelect");
+  static NumInp = new QuestionTypes("NumInp");
 }
 
 class PropertyTypes extends Enum {
   static Prompt = new PropertyTypes("Prompt");
   static TextBox = new PropertyTypes("TextBox");
   static ImageSelect = new PropertyTypes("ImageSelect");
+  static NumInp = new PropertyTypes("NumInp");
   // contains all the properties for each of the property types
   static templates = new Map([
     [
@@ -46,6 +48,13 @@ class PropertyTypes extends Enum {
         selected: [0, 0], // coordinates of the selected point
       },
     ],
+    [
+      PropertyTypes.NumInp.toString(),
+      {
+        max: 10,
+        min: 0,
+      }
+    ]
   ]);
 }
 
@@ -79,7 +88,6 @@ function notify(msg, cat, timeout = 1500) {
       },
     })
   );
-  console.log("Notify called");
 }
 
 // checks if the request is ok then converts to json
@@ -178,6 +186,26 @@ const getPos = (el) => {
     y: window.scrollY + rect.top,
   };
 };
+
+const NumInp = (min, max, index) => ({
+  val : min,
+  init() {
+    this.$watch("val", () => {
+      this.validate();
+      this.$store.responses[index] = this.val;
+    });
+  },
+  validate() {
+    // make sure not to pass 
+    if (parseInt(this.val) > max) {
+      this.val = max;
+    }
+    if (parseInt(this.val) < min) {
+      this.val = min;
+    }
+  }
+});
+
 
 // loads the img into a data url so that it can be used in offline mode
 const getFieldImage = async () => {

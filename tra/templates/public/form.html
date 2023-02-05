@@ -28,8 +28,13 @@
                 <template x-if="PropertyTypes.TextBox.equals(comp.type)">
                   {% include 'public/components/textbox.html' %}
                 </template>
+                <!--Field select-->
                 <template x-if="PropertyTypes.ImageSelect.equals(comp.type)">
                   {% include 'public/components/imageselect.html' %}
+                </template>
+                <!--Number Input-->
+                <template x-if="PropertyTypes.NumInp.equals(comp.type)">
+                  {% include 'public/components/number-inp.html' %}
                 </template>
               </div>
             </template>
