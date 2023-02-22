@@ -190,6 +190,7 @@ const getPos = (el) => {
 const NumInp = (min, max, index) => ({
   val : min,
   init() {
+    this.$store.responses[index] = this.val;
     this.$watch("val", () => {
       this.validate();
       this.$store.responses[index] = this.val;

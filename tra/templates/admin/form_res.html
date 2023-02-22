@@ -90,7 +90,8 @@
                         <div x-data="{
                           average : 0,
                           getAverage(teamRes) {
-                            resMap[teamNum].forEach((e) => {this.average += parseInt(e.responses[0]); });
+                            this.average = 0;
+                            resMap[teamNum].forEach((e) => {this.average += parseInt(e.responses[i]); });
                             this.average /= this.resMap[teamNum].length;
                             console.log(this.average)
                           } 
@@ -243,8 +244,9 @@
         res: [responses]
       }
       */
+
       // put 0.75 sec delay between qr code scans
-      if (Date.now() - this.lastScanTime < 1000) {
+      if (Date.now() - this.lastScanTime < 1500) {
         return;
       }
       // dispatches an updateRes event that will update the resMap in formRes
