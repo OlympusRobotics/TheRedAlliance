@@ -14,7 +14,7 @@ app.config["SQLALCEHMY_TRACK_MODIFICATIONS"] = False
 app.permanent_session_lifetime = timedelta(days=3)
 db = SQLAlchemy(app)  # create a database object
 
-limiter = Limiter(app, key_func=get_remote_address, storage_uri="memory://")
+limiter = Limiter(get_remote_address, app=app, storage_uri="memory://")
 
 # Register all the blueprints
 from .routes.admin import bp as admin_routes

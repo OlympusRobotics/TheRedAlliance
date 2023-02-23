@@ -81,6 +81,26 @@
                       </template>
                     </div>
                   </template>
+                  
+                  <template
+                    x-if="PropertyTypes.NumInp.equals(q.components[1].type)"
+                  >
+                    <div class="columns is-mobile">
+                      <div class="column is-narrow box">
+                        <div x-data="{
+                          average : 0,
+                          getAverage(teamRes) {
+                            this.average = 0;
+                            resMap[teamNum].forEach((e) => {this.average += parseInt(e.responses[i]); });
+                            this.average /= this.resMap[teamNum].length;
+                            console.log(this.average)
+                          } 
+                        }" x-init="$watch('resMap', (e) => this.getAverage(e[teamNum]))">
+                          <span x-init="getAverage(resMap[teamNum])" x-text="'Average: ' + average" class="title is-5"></span>
+                        </div>
+                      </div>
+                    </div>
+                  </template>
                 </div>
               </template>
             </div>
@@ -224,8 +244,9 @@
         res: [responses]
       }
       */
+
       // put 0.75 sec delay between qr code scans
-      if (Date.now() - this.lastScanTime < 1000) {
+      if (Date.now() - this.lastScanTime < 1500) {
         return;
       }
       // dispatches an updateRes event that will update the resMap in formRes
