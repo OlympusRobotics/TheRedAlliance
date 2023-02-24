@@ -193,6 +193,9 @@ const NumInp = (min, max, index) => ({
     this.$store.responses[index] = this.val;
     this.$watch("val", () => {
       this.validate();
+      if (this.val == "") {
+        this.$store.responses[index] = min;
+      }
       this.$store.responses[index] = this.val;
     });
   },
