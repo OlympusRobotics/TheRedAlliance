@@ -5,7 +5,9 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from werkzeug.exceptions import HTTPException
 
+
 app = Flask(__name__)  # instance of flask
+app.config['UPLOAD_FOLDER'] = "tra/static/pictures"
 app.secret_key = b"\x14J\xff\x00\x9c\xf3\x80\xab\xda\r8\xa9\xad3D\xab"  # encryption key for session data. Obviously this will change in production
 app.config[
     "SQLALCHEMY_DATABASE_URI"

@@ -49,6 +49,8 @@ class Form(db.Model):
 class Team(db.Model):
     id = db.Column("id", db.Integer, primary_key=True)  # pk
     number = db.Column(db.Integer, nullable=False)
+    notes = db.Column(db.Text, nullable=False, default="")
+    pfp_url = db.Column(db.Text, nullable=False, default="/static/assets/robot-cat.png")
     form_id = db.Column(db.Integer, db.ForeignKey(Form.id), nullable=False)
     responses = db.relationship("Response", backref="team")
 

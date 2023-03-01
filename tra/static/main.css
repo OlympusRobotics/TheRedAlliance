@@ -118,6 +118,14 @@ hr.title-hr {
   transform: translateY(0px);
 }
 
+.team-pfp {
+  width: 35% !important;
+  height: auto;
+  padding: 0.5rem;
+  border: 2px solid #323232;
+  border-radius: 2rem;
+}
+
 .image-select-dot {
   position: absolute;
   width: 10px;

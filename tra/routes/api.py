@@ -1,7 +1,12 @@
 "These routes are JSON responses ONLY"
+import re
+import os
+import json
+import random
+import string
 from tra import db, limiter
-import re, random, string, json
 from tra.helpers import authorized
+from werkzeug.utils import secure_filename
 from tra.models import Admin, Form, FormQuestion, Team, Response
 from flask import Blueprint, request, render_template, session, jsonify, abort, flash
 
@@ -25,7 +30,8 @@ def create_form():
         admin=admin,
         code=code,
         json_repr=json.dumps(
-            {"name": "FRC Scouting Form", "code": code, "draft": True, "questions": []}
+            {"name": "FRC Scouting Form", "code": code,
+                "draft": True, "questions": []}
         ),
     )
 
@@ -68,17 +74,18 @@ def edit_form(code):
     responses = []
     # TODO: make this not so stupid
     for q in form.questions:
-    #     responses.append(q.responses)
+        #     responses.append(q.responses)
         db.session.delete(q)
     db.session.commit()
     for q in json_repr["questions"]:
-        form.questions.append(FormQuestion(code=q["code"], form=form, data=json.dumps(q)))
+        form.questions.append(FormQuestion(
+            code=q["code"], form=form, data=json.dumps(q)))
     db.session.commit()
     print(form.questions)
 
     # if empty name, make the name "Untitled Form"
     if len(json_repr["name"]) == 0:
-        json_repr["name"] = "Untitled Form" 
+        json_repr["name"] = "Untitled Form"
     form.json_repr = json.dumps(json_repr)
     form.draft = json_repr["draft"]
     form.name = json_repr["name"]
@@ -97,7 +104,7 @@ def delete_form(code):
     # remove all the questions
     for q in form.questions:
         db.session.delete(q)
-    
+
     for r in responses:
         db.session.delete(r)
 
@@ -125,9 +132,11 @@ def get_forms():
     admin = authorized(session)
     forms = []
     for form in admin.forms:
-        forms.append({"code": form.code, "name": form.name, "draft": form.draft})
+        forms.append(
+            {"code": form.code, "name": form.name, "draft": form.draft})
 
     return {"forms": forms}
+
 
 @bp.route("/respond/<code>", methods=["POST"])
 def respond(code):
@@ -142,10 +151,11 @@ def respond(code):
         db.session.add(team_data)
         db.session.commit()
 
-    db.session.add(Response(team=team_data, form_id=form.id, name=name, data=json.dumps(response)))
+    db.session.add(Response(team=team_data, form_id=form.id,
+                   name=name, data=json.dumps(response)))
     db.session.commit()
 
-    return {'status' : 200}
+    return {'status': 200}
 
 
 @bp.route("/getteamnums/<code>")
@@ -154,9 +164,9 @@ def get_team_nums(code):
     """ Returns a list of team numbers for the given form """
     admin = authorized(session)
     form = Form.query.filter_by(code=code, admin=admin).first_or_404()
-    return { "numbers" : 
-        [ team.number for team in form.teams ]
-    }
+    return {"numbers":
+            [team.number for team in form.teams]
+            }
 
 
 @bp.route("/getdata/<code>/<team_num>")
@@ -166,18 +176,20 @@ def get_question_data(code, team_num):
     admin = authorized(session)
     form = Form.query.filter_by(code=code, admin=admin).first_or_404()
     team = Team.query.filter_by(number=team_num, form=form).first_or_404()
-    
-    return { "data" :
-        [
-            {
-                "name" : res.name,
-                "responses" : json.loads(res.data)
+
+    return {"data":
+            [
+                {
+                    "name": res.name,
+                    "responses": json.loads(res.data),
+                }
+                for res in team.responses
+            ]
             }
-            for res in team.responses
-        ]
-    }
+
 
 MIN_USER_LEN = 6
+
 
 def validate_username(username):
     "query the username and check if it is valid. Returns a message which can be directly put into the HTML"
@@ -203,13 +215,60 @@ def is_username_valid():
     return validate_username(request.args["username"])
 
 
+@bp.route("/uploadpfp/<form_code>/<team_num>", methods=['POST'])
+def upload_photo(form_code, team_num):
+    if 'pic' not in request.files:
+        abort(400, description="No file")
+
+    file = request.files['pic']
+    # If the user does not select a file, the browser submits an
+    # empty file without a filename.
+    if file.filename == '':
+        abort(400, description="Empty Filename)")
+
+    admin = authorized(session)
+    form = Form.query.filter_by(admin=admin, code=form_code).first_or_404()
+    team = Team.query.filter_by(form=form, number=team_num).first_or_404()
+
+    if file:
+        # save file
+        filename = secure_filename(file.filename)
+        file.save(os.path.join("tra/static/pictures/", filename))
+
+        # update team pfp url
+        team.pfp_url = "/static/pictures/" + filename
+        db.session.commit()
+
+        return jsonify(pfp=team.pfp_url), 200
+
+
+@bp.route("/getprofiledata/<form_code>/<team_num>")
+def get_profile_data(form_code, team_num):
+    admin = authorized(session)
+    team = Team.query.filter_by(number=team_num, form=Form.query.filter_by(
+        admin=admin, code=form_code).first_or_404()).first_or_404()
+    return jsonify(pfp=team.pfp_url, notes=team.notes), 200
+
+@bp.route("/updatenotes/<form_code>/<team_num>", methods=["POST"])
+def update_notes(form_code, team_num):
+    admin = authorized(session)
+    team = Team.query.filter_by(number=team_num, form=Form.query.filter_by(
+        admin=admin, code=form_code).first_or_404()).first_or_404()
+
+    team.notes = request.json['notes']
+    db.session.commit()
+    return jsonify(status=200), 200
+
+
 @bp.errorhandler(429)
 def rate_limited(e):
     return {"error": "Slow Down! Rate Limit Exceeded."}, 429
 
+
 @bp.errorhandler(403)
 def unauthorized(e):
-    return {"error" : "Unauthenticated. Please login again"}, 403
+    return {"error": "Unauthenticated. Please login again"}, 403
+
 
 @bp.errorhandler(400)
 def jsonify_error(e):
