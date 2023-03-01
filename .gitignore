@@ -261,3 +261,5 @@ dist
 .pnp.*
 bulmajs/
 data.sqlite3
+pictures/*
+!pictures/.gitkeep

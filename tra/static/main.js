@@ -118,7 +118,9 @@ const ImageSelect = () => ({
     this.$watch("img", () => {
       if (this.img != null) {
         // when the img is loaded, get the width and height to scale te coord
-        this.img.onload = () => {
+        this.img.onload = async () => {
+          // wait to allow img to load fully
+          await new Promise(r => setTimeout(r, 1000));
           this.coords = getPos(this.img);
           this.size = {
             x: this.img.width,
@@ -154,7 +156,7 @@ const ImageSelectPublic = (index) => ({
     this.$watch("img", () => {
       if (this.img != null) {
         // when the img is loaded, get the width and height to scale te coord
-        this.img.onload = () => {
+        this.img.onload = async () => {
           this.coords = getPos(this.img);
           this.size = {
             x: this.img.width,
@@ -189,42 +191,58 @@ const getPos = (el) => {
 
 const NumInp = (min, max, index) => ({
   val : min,
+  min : min,
+  max : max,
   init() {
     this.$store.responses[index] = this.val;
     this.$watch("val", () => {
       this.validate();
-      if (this.val == "") {
-        this.$store.responses[index] = min;
-      }
       this.$store.responses[index] = this.val;
     });
   },
   validate() {
     // make sure not to pass 
-    if (parseInt(this.val) > max) {
-      this.val = max;
+    if (parseInt(this.val) > this.max) {
+      this.val = this.max;
     }
-    if (parseInt(this.val) < min) {
-      this.val = min;
+    if (parseInt(this.val) < this.min) {
+      this.val = this.min;
     }
   }
 });
 
 
 // loads the img into a data url so that it can be used in offline mode
+
 const getFieldImage = async () => {
-  if (this.dataUrl) {
-    return this.dataUrl;
+  if (this.fieldImg) {
+    return this.fieldImg;
   }
-  var blob = await fetch("/static/assets/field.jpg").then((r) => r.blob());
-  var dataUrl = await new Promise((resolve) => {
+  this.fieldImg= loadImg("/static/assets/field.jpg");
+  return this.fieldImg;
+};
+
+const getDefaultPfp = async () => {
+  if (this.pfp) {
+    return this.pfp;
+  }
+  this.pfp= loadImg("/static/assets/robot-cat.png");
+  return this.pfp;
+}
+
+
+
+const loadImg = async (url) => {
+  // get the img
+  var blob = await fetch(url).then((r) => r.blob());
+  return await new Promise((resolve) => {
+    // read it as a data url
     let reader = new FileReader();
     reader.onload = () => resolve(reader.result);
     reader.readAsDataURL(blob);
   });
-  this.dataUrl = dataUrl;
-  return this.dataUrl;
-};
+}
+
 
 // ---------- Straight from Bulma website https://bulma.io/documentation/components/navbar/
 // controls the navbar burger

@@ -8,6 +8,7 @@
       x-model="val"
       x-mask="999999"
       :placeholder="comp.min"
+      @blur="this.val == '' ? this.val = this.min : ''"
     />
   </div>
   <div class="column is-narrow">
