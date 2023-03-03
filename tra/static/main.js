@@ -217,6 +217,9 @@ const LevelSelectRes = (index) => ({
 
 const LevelSelect = (index) => ({
   levels: [],
+  init() {
+    this.$store.responses[index] = this.levels;
+  },
   toggleLevel(level) {
     let i = this.levels.indexOf(level);
     if (i > -1) {
