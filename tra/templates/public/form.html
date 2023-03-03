@@ -36,6 +36,10 @@
                 <template x-if="PropertyTypes.NumInp.equals(comp.type)">
                   {% include 'public/components/number-inp.html' %}
                 </template>
+                <!--Level Select-->
+                <template x-if="PropertyTypes.LevelSelect.equals(comp.type)">
+                  {% include 'public/components/level-select.html' %}
+                </template>
               </div>
             </template>
             <hr />

@@ -1,0 +1,9 @@
+<div x-data="LevelSelect(index)">
+  <template x-for="i in 3">
+    <div
+      @click="toggleLevel(i)"
+      class="level-select-bar"
+      :class="levels.includes(i) ? 'selected' : ''"
+    ></div>
+  </template>
+</div>

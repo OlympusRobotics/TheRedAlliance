@@ -65,8 +65,13 @@
                     <template x-if="PropertyTypes.TextBox.equals(comp.type)">
                       {% include 'properties/textbox.html' %}
                     </template>
+                    <!-- num input -->
                     <template x-if="PropertyTypes.NumInp.equals(comp.type)">
                       {% include 'properties/number-inp.html' %}
+                    </template>
+                    <!-- level select -->
+                    <template x-if="PropertyTypes.LevelSelect.equals(comp.type)">
+                      {% include 'properties/level-select.html' %}
                     </template>
                     <!--If it is an image select -->
                     <template
@@ -100,6 +105,7 @@
           <button @click="createQuestion(QuestionTypes.TextBox)" class="button is-primary">Textbox</button>
           <button @click="createQuestion(QuestionTypes.ImageSelect)" class="button is-primary">Field Select</button>
           <button @click="createQuestion(QuestionTypes.NumInp)" class="button is-primary">Number</button>
+          <button @click="createQuestion(QuestionTypes.LevelSelect)" class="button is-primary">Level Select</button>
           <button @click="addQuestion = false" class="button is-danger is-outlined">X</button>
       </div>
     </div>
@@ -240,6 +246,10 @@
     else if (QuestionTypes.NumInp.equals(type)) {
       out.push(questionComponent(PropertyTypes.Prompt));
       out.push(questionComponent(PropertyTypes.NumInp));
+    }
+    else if (QuestionTypes.LevelSelect.equals(type)) {
+      out.push(questionComponent(PropertyTypes.Prompt));
+      out.push(questionComponent(PropertyTypes.LevelSelect));
     }
     else {
       console.warn("Bruh what kind of question is this? " + type);

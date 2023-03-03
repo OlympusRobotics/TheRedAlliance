@@ -135,21 +135,30 @@
                           average : 0,
                           getAverage(teamRes) {
                             this.average = 0;
-                            resMap[teamNum].forEach((e) => {this.average += parseInt(e.responses[i]); });
+                            teamRes.forEach((e) => {this.average += parseInt(e.responses[i]); });
                             this.average /= this.resMap[teamNum].length;
                           } 
                         }"
-                          x-init="$watch('resMap', (e) => this.getAverage(e[teamNum]))"
+                          x-init="$watch('resMap', (e) => getAverage(e[teamNum]))"
                         >
                           <span
-                            x-init="getAverage(resMap[teamNum])"
+                            x-init=""
                             x-text="'Average: ' + average"
                             class="title is-5"
                           ></span>
                         </div>
                       </div>
                     </div>
-                  </template>
+                </template>
+                <!-- level select -->
+                <template x-if="PropertyTypes.LevelSelect.equals(q.components[1].type)">
+                  <div x-data="LevelSelectRes(i)"
+                      x-init="$watch('resMap', (e) => getAverages(e[teamNum]))">
+                    <template x-for="i in 3">
+                      <div style="background-color: #1E98D1" :style="{ opacity: levels[i-1] }" class="level-select-bar"></div>
+                    </template>
+                  </div>
+                </template>
                 </div>
               </template>
             </div>
