@@ -21,6 +21,7 @@ class QuestionTypes extends Enum {
   static MultipleChoice = new QuestionTypes("MultipleChoice");
   static ImageSelect = new QuestionTypes("ImageSelect");
   static NumInp = new QuestionTypes("NumInp");
+  static LevelSelect = new QuestionTypes("LevelSelect");
 }
 
 class PropertyTypes extends Enum {
@@ -28,6 +29,7 @@ class PropertyTypes extends Enum {
   static TextBox = new PropertyTypes("TextBox");
   static ImageSelect = new PropertyTypes("ImageSelect");
   static NumInp = new PropertyTypes("NumInp");
+  static LevelSelect = new QuestionTypes("LevelSelect");
   // contains all the properties for each of the property types
   static templates = new Map([
     [
@@ -53,8 +55,14 @@ class PropertyTypes extends Enum {
       {
         max: 10,
         min: 0,
-      }
-    ]
+      },
+    ],
+    [
+      PropertyTypes.LevelSelect.toString(),
+      {
+        levels: [],
+      },
+    ],
   ]);
 }
 
@@ -120,7 +128,7 @@ const ImageSelect = () => ({
         // when the img is loaded, get the width and height to scale te coord
         this.img.onload = async () => {
           // wait to allow img to load fully
-          await new Promise(r => setTimeout(r, 1000));
+          await new Promise((r) => setTimeout(r, 1000));
           this.coords = getPos(this.img);
           this.size = {
             x: this.img.width,
@@ -135,9 +143,9 @@ const ImageSelect = () => ({
       x: (this.size.x / FIELD_X) * point[0] + this.coords.x,
       y: (this.size.y / FIELD_Y) * point[1] + this.coords.y,
     };
-    return scaled;},
-
-  });
+    return scaled;
+  },
+});
 
 // uses in form.html only
 const ImageSelectPublic = (index) => ({
@@ -189,10 +197,42 @@ const getPos = (el) => {
   };
 };
 
+const LevelSelectRes = (index) => ({
+  levels: [0, 0, 0],
+  init() {
+  },
+  getAverages(responses) {
+    let total = 0;
+    responses.forEach((e) => {
+      for (const level of e.responses[index]) {
+        this.levels[level-1]++;
+        total ++;
+      }
+    });
+    // convert to percentages
+    this.levels = this.levels.map((e) => e / total);
+    console.log(this.levels);
+  },
+});
+
+const LevelSelect = (index) => ({
+  levels: [],
+  toggleLevel(level) {
+    let i = this.levels.indexOf(level);
+    if (i > -1) {
+      this.levels.splice(i, 1);
+    } else {
+      this.levels.push(level);
+    }
+    // add to res
+    this.$store.responses[index] = this.levels;
+  },
+});
+
 const NumInp = (min, max, index) => ({
-  val : min,
-  min : min,
-  max : max,
+  val: min,
+  min: min,
+  max: max,
   init() {
     this.$store.responses[index] = this.val;
     this.$watch("val", () => {
@@ -201,16 +241,15 @@ const NumInp = (min, max, index) => ({
     });
   },
   validate() {
-    // make sure not to pass 
+    // make sure not to pass
     if (parseInt(this.val) > this.max) {
       this.val = this.max;
     }
     if (parseInt(this.val) < this.min) {
       this.val = this.min;
     }
-  }
+  },
 });
-
 
 // loads the img into a data url so that it can be used in offline mode
 
@@ -218,7 +257,7 @@ const getFieldImage = async () => {
   if (this.fieldImg) {
     return this.fieldImg;
   }
-  this.fieldImg= loadImg("/static/assets/field.jpg");
+  this.fieldImg = loadImg("/static/assets/field.jpg");
   return this.fieldImg;
 };
 
@@ -226,11 +265,9 @@ const getDefaultPfp = async () => {
   if (this.pfp) {
     return this.pfp;
   }
-  this.pfp= loadImg("/static/assets/robot-cat.png");
+  this.pfp = loadImg("/static/assets/robot-cat.png");
   return this.pfp;
-}
-
-
+};
 
 const loadImg = async (url) => {
   // get the img
@@ -241,8 +278,7 @@ const loadImg = async (url) => {
     reader.onload = () => resolve(reader.result);
     reader.readAsDataURL(blob);
   });
-}
-
+};
 
 // ---------- Straight from Bulma website https://bulma.io/documentation/components/navbar/
 // controls the navbar burger

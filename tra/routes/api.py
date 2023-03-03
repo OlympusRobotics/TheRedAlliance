@@ -109,6 +109,7 @@ def delete_form(code):
         db.session.delete(r)
 
     for t in teams:
+        # remove the pfp 
         os.remove("tra" + t.pfp_url)
         db.session.delete(t)
 
