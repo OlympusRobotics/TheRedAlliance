@@ -1,5 +1,13 @@
-<div>
-  <div class="level-select-bar"></div>
-  <div class="level-select-bar"></div>
-  <div class="level-select-bar"></div>
-</div>
+<template x-for="i in 3">
+  <div class="level-select-bar columns is-mobile is-vcentered is-centered">
+    <div class="column is-narrow">
+      <button class="button"><i class="icon">-</i></button>
+    </div>
+    <div class="column is-narrow">
+      <input placeholder="0" class="input is-medium is-rounded" />
+    </div>
+    <div class="column is-narrow is-flex is-justify-content-right">
+      <button class="button"><i class="icon">+</i></button>
+    </div>
+  </div>
+</template>

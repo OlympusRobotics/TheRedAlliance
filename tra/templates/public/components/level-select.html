@@ -1,9 +1,15 @@
-<div x-data="LevelSelect(index)">
+<div x-data="LevelSelect(index)" class="mt-4">
   <template x-for="i in 3">
-    <div
-      @click="toggleLevel(i)"
-      class="level-select-bar"
-      :class="levels.includes(i) ? 'selected' : ''"
-    ></div>
+    <div class="level-select-bar columns is-mobile is-vcentered is-centered">
+      <div class="column is-narrow">
+        <button @click="increment(i-1, -1)" class="button"><i class="icon">-</i></button>
+      </div>
+      <div class="column is-narrow">
+        <input readonly placeholder="0" x-model="levels[i-1]" class="input is-medium is-rounded" />
+      </div>
+      <div class="column is-narrow is-flex is-justify-content-right">
+        <button @click="increment(i-1, 1)" class="button"><i class="icon">+</i></button>
+      </div>
+    </div>
   </template>
 </div>

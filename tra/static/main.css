@@ -140,12 +140,18 @@ hr.title-hr {
 }
 
 .level-select-bar {
-  width: 16rem;
-  height: 4rem;
+  width: 28rem;
+  height: 6rem;
   border: #b5b5b5 solid;
+  display: flex;
   border-radius: 0.5rem;
   margin: 0 auto;
   margin-bottom: 0.2rem;
+}
+
+.level-select-bar .input {
+  width: 8rem !important;
+  text-align: center;
 }
 .level-select-bar:first {
   margin-top: 2rem !important;
