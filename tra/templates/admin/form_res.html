@@ -149,16 +149,25 @@
                         </div>
                       </div>
                     </div>
-                </template>
-                <!-- level select -->
-                <template x-if="PropertyTypes.LevelSelect.equals(q.components[1].type)">
-                  <div x-data="LevelSelectRes(i)"
-                      x-init="$watch('resMap', (e) => getAverages(e[teamNum]))">
-                    <template x-for="i in 3">
-                      <div style="background-color: #1E98D1" :style="{ opacity: levels[i-1] }" class="level-select-bar"></div>
-                    </template>
-                  </div>
-                </template>
+                  </template>
+                  <!-- level select -->
+                  <template
+                    x-if="PropertyTypes.LevelSelect.equals(q.components[1].type)"
+                  >
+                    <div
+                      x-data="LevelSelectRes(i)"
+                      x-init="$watch('resMap', (e) => getAverages(e[teamNum]))"
+                    >
+                      <template x-for="i in 3">
+                        <div
+                          class="level-select-bar"
+                          style="text-align: center; display: block;"
+                        >
+                          <span class="title is-2" x-text="(levels[i-1]).toFixed(2)"></span>
+                        </div>
+                      </template>
+                    </div>
+                  </template>
                 </div>
               </template>
             </div>

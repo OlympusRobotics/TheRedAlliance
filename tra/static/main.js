@@ -199,35 +199,27 @@ const getPos = (el) => {
 
 const LevelSelectRes = (index) => ({
   levels: [0, 0, 0],
-  init() {
-  },
+  init() {},
   getAverages(responses) {
-    let total = 0;
+    let totals = [0, 0, 0];
     responses.forEach((e) => {
-      for (const level of e.responses[index]) {
-        this.levels[level-1]++;
-        total ++;
+      for (let i = 0; i<e.responses[index].length; i++) {
+        this.levels[i] += e.responses[index][i];
       }
     });
-    // convert to percentages
-    this.levels = this.levels.map((e) => e / total);
-    console.log(this.levels);
+    this.levels = this.levels.map((e) => e / responses.length);
   },
 });
 
 const LevelSelect = (index) => ({
-  levels: [],
+  levels: [0, 0, 0],
   init() {
     this.$store.responses[index] = this.levels;
   },
-  toggleLevel(level) {
-    let i = this.levels.indexOf(level);
-    if (i > -1) {
-      this.levels.splice(i, 1);
-    } else {
-      this.levels.push(level);
+  increment(level, x) {
+    if (this.levels[level] + x >= 0 && this.levels[level] + x <= 30) {
+      this.levels[level] += x;
     }
-    // add to res
     this.$store.responses[index] = this.levels;
   },
 });

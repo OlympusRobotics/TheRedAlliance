@@ -110,7 +110,8 @@ def delete_form(code):
 
     for t in teams:
         # remove the pfp 
-        os.remove("tra" + t.pfp_url)
+        if t.pfp_url != "/static/assets/robot-cat.png":
+            os.remove("tra" + t.pfp_url)
         db.session.delete(t)
 
     db.session.delete(form)
