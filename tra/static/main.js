@@ -22,6 +22,7 @@ class QuestionTypes extends Enum {
   static ImageSelect = new QuestionTypes("ImageSelect");
   static NumInp = new QuestionTypes("NumInp");
   static LevelSelect = new QuestionTypes("LevelSelect");
+  static MultSelect = new QuestionTypes("MultSelect");
 }
 
 class PropertyTypes extends Enum {
@@ -29,7 +30,8 @@ class PropertyTypes extends Enum {
   static TextBox = new PropertyTypes("TextBox");
   static ImageSelect = new PropertyTypes("ImageSelect");
   static NumInp = new PropertyTypes("NumInp");
-  static LevelSelect = new QuestionTypes("LevelSelect");
+  static LevelSelect = new PropertyTypes("LevelSelect");
+  static MultSelect = new PropertyTypes("MultSelect");
   // contains all the properties for each of the property types
   static templates = new Map([
     [
@@ -61,6 +63,10 @@ class PropertyTypes extends Enum {
       PropertyTypes.LevelSelect.toString(),
       {
         levels: [],
+      },
+      PropertyTypes.MultSelect.toString(),
+      {
+        texts : ["No", "Yes"]
       },
     ],
   ]);
