@@ -201,7 +201,9 @@ const LevelSelectRes = (index) => ({
   levels: [0, 0, 0],
   init() {},
   getAverages(responses) {
-    let totals = [0, 0, 0];
+    if (responses === undefined) 
+      return;
+
     responses.forEach((e) => {
       for (let i = 0; i<e.responses[index].length; i++) {
         this.levels[i] += e.responses[index][i];
