@@ -1,22 +1,32 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} {% block content %}
 
-{% block content %}
-
-<div class="hero is-transparent is-halfheight ">
-  <div class="title hero-head" style="text-align: center; margin-top: 1.5rem; color:rgb(186, 24, 57);">
-    Admin Setup 
-    <hr>
+<div class="hero is-transparent is-halfheight">
+  <div
+    class="title hero-head"
+    style="text-align: center; margin-top: 1.5rem; color: rgb(186, 24, 57)"
+  >
+    Admin Setup
+    <hr />
   </div>
   <div class="hero-body">
     <div class="container animate__animated animate__fadeInUp">
       <div class="columns is-centered is-mobile">
-        <div class="column is-three-quarters-mobile is-5-tablet is-4-desktop is-3-widescreen">
+        <div
+          class="column is-three-quarters-mobile is-5-tablet is-4-desktop is-3-widescreen"
+        >
           <form x-data="registerForm()" method="POST" action="" class="box">
             <div class="field">
               <label for="" class="label">Email</label>
               <div class="control has-icons-left">
-                <input @blur="validateUsername" @input.debounce.750ms="validateUsername" x-model="username" id="username" name="username" type="name" placeholder="Jason Quang"
-                  class="input" required>
+                <input
+                  x-model="username"
+                  id="username"
+                  name="username"
+                  type="name"
+                  placeholder="Jason Quang"
+                  class="input"
+                  required
+                />
                 <span class="icon is-small is-left">
                   <i class="fa fa-envelope"></i>
                 </span>
@@ -25,8 +35,15 @@
             <div class="field">
               <label for="" class="label">Password</label>
               <div class="control has-icons-left">
-                <input id="password" name="password" x-model="password" type="password" placeholder="*******"
-                  class="input" required>
+                <input
+                  id="password"
+                  name="password"
+                  x-model="password"
+                  type="password"
+                  placeholder="*******"
+                  class="input"
+                  required
+                />
                 <span class="icon is-small is-left">
                   <i class="fa fa-lock"></i>
                 </span>
@@ -35,8 +52,14 @@
             <div class="field">
               <label for="" class="label">Confirm Password</label>
               <div class="control has-icons-left">
-                <input @blur="validatePassword" @input.debounce.500ms="validatePassword" x-model="confPassword" id="password-confirm" type="password" placeholder="*******"
-                  class="input" required>
+                <input
+                  x-model="confPassword"
+                  id="password-confirm"
+                  type="password"
+                  placeholder="*******"
+                  class="input"
+                  required
+                />
                 <span class="icon is-small is-left">
                   <i class="fa fa-lock"></i>
                 </span>
@@ -44,18 +67,23 @@
             </div>
             <div class="field">
               <label for="" class="checkbox">
-                <input name="persist" type="checkbox">
+                <input name="persist" type="checkbox" />
                 Remember me
               </label>
             </div>
             <div class="field">
-              <button :disabled="!pwValidated || !unValidated " class="button is-danger" >
+              <button
+                :disabled="!pwValidated || !unValidated "
+                class="button is-danger"
+              >
                 Set up
               </button>
             </div>
             <span id="form-feedback" x-text="formFeedback"></span>
-            <br>
-            <a href="{{ url_for('admin.admin_login') }}">Already have an account?</a>
+            <br />
+            <a href="{{ url_for('admin.admin_login') }}"
+              >Already have an account?</a
+            >
           </form>
         </div>
       </div>
@@ -66,49 +94,61 @@
 <script>
   // sorry, i know its confusing because I changed halfway
   // from using usernames to emails
-function registerForm() {
+  function registerForm() {
     return {
-        password : '',
-        confPassword : '',
-        formFeedback : '',
-        username : '',
-        pwValidated : false, // turns true when validatePassword passes
-        unValidated : false,
+      password: "",
+      confPassword: "",
+      formFeedback: "",
+      username: "",
+      pwValidated: false, // turns true when validatePassword passes
+      unValidated: false,
+      init() {
+        this.$watch("username", () => this.validateUsername());
+        this.$watch("confPassword, password", () => this.validatePassword());
+      },
 
-        validateUsername() {
-          // if its empty get rid of form feedback
-          if (this.username.trim() === "") {
-            this.formFeedback = "";
-            return;
-          }
-          fetch(`${window.location.origin}/api/admin/is_username_valid?username=${this.username}`)
-          .then(res => checkOk(res))
-          .then(res => {
+      validateUsername() {
+        this.saving = true;
+        clearTimeout(this.timer);
+        this.timer = setTimeout(() => {
+          this._validateUsername();
+        }, 500);
+      },
+      _validateUsername() {
+        // if its empty get rid of form feedback
+        if (this.username.trim() === "") {
+          this.formFeedback = "";
+          return;
+        }
+        fetch(
+          `${window.location.origin}/api/admin/is_username_valid?username=${this.username}`
+        )
+          .then((res) => checkOk(res))
+          .then((res) => {
             this.formFeedback = res.valid;
             if (res.valid === "") {
               this.unValidated = true; //the UN is valid
             }
           });
-        },
-        validatePassword () {
-            if (this.password != this.confPassword) {
-                this.formFeedback = "Passwords do not match";
-                this.pwValidated= false;
-            }
-            else if (this.password.length < 6) {
-                this.formFeedback = "Password must be atleast 6 characters long";
-                this.pwValidated= false;
-            }
-            else {
-                this.formFeedback = "";
-                this.pwValidated= true;
-            }
+      },
+      validatePassword() {
+        if (this.confPassword.length == 0) {
+          return;
+          this.pwValidated = false;
         }
-    }
-}
-
+        if (this.password != this.confPassword) {
+          this.formFeedback = "Passwords do not match";
+          this.pwValidated = false;
+        } else if (this.password.length < 6) {
+          this.formFeedback = "Password must be atleast 6 characters long";
+          this.pwValidated = false;
+        } else {
+          this.formFeedback = "";
+          this.pwValidated = true;
+        }
+      },
+    };
+  }
 </script>
-
-
 
 {% endblock %}

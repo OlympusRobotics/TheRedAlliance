@@ -209,6 +209,7 @@ const LevelSelectRes = (index) => ({
         this.levels[i] += e.responses[index][i];
       }
     });
+      
     this.levels = this.levels.map((e) => e / responses.length);
   },
 });
