@@ -103,6 +103,9 @@
       pwValidated: false, // turns true when validatePassword passes
       unValidated: false,
       init() {
+        // account for auto fill.
+        this.validateUsername();
+        this.validatePassword();
         this.$watch("username", () => this.validateUsername());
         this.$watch("confPassword, password", () => this.validatePassword());
       },
@@ -112,7 +115,7 @@
         clearTimeout(this.timer);
         this.timer = setTimeout(() => {
           this._validateUsername();
-        }, 500);
+        }, 250);
       },
       _validateUsername() {
         // if its empty get rid of form feedback

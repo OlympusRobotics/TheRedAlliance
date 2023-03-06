@@ -27,6 +27,7 @@ def admin_page():
     admin = authorized(session)
     return render_template("admin/admin.html", admin=admin)
 
+
 @bp.route("/responses/<code>")
 def form_res(code):
     admin = authorized(session)
@@ -40,7 +41,8 @@ def admin_login():
     if request.method == "POST":
 
         # check creds
-        admin = Admin.query.filter_by(username=request.form["username"]).first()
+        admin = Admin.query.filter_by(
+            username=request.form["username"]).first()
         # if an admin is found, check password
         if admin is not None:
             if (
@@ -68,8 +70,8 @@ def register():
         if validate_username(request.form["username"])["valid"] != "":
             abort(400)
         admin = Admin(
-            username=request.form["username"], password=request.form["password"]
-        )
+            username=request.form["username"], password=request.form["password"], key=secrets.token_hex(256))
+
         db.session.add(admin)
         db.session.commit()
         # log the user in
