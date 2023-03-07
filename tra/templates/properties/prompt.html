@@ -1,18 +1,24 @@
 <!-- question and comp object needs to be passed with alpine  -->
-<div>
-    <!-- the label is inveresly bound to the input.  -->
-    <label 
+<div x-data="{inp : null}">
+  <!-- the label is inveresly bound to the input.  -->
+  <label
     x-text="comp.text"
-    x-show="!comp.edit" 
-    class="label is-medium" 
-    :for="$id('question-prompt')" 
-    @click="comp.edit = true"
-    >
-    </label>
-    <input
+    x-show="!comp.edit"
+    class="label is-medium"
+    :for="$id('question-prompt')"
+    @click="async () => {
+        comp.edit = true;
+        // wait for input to become editable before selecting
+        await $nextTick(()=>{});
+        inp.select()
+    }"
+  >
+  </label>
+  <input
     autocomplete="off"
     maxlength="45"
     type="text"
+    x-init="inp = $el"
     :id="$id('question-prompt')"
     x-show="comp.edit"
     x-model="comp.text"
@@ -21,6 +27,5 @@
     :class="{ 'is-danger' : comp.text.length == 0 }"
     @blur="comp.text.length > 0 ? comp.edit = false : comp.edit = true"
     @keyup.enter="comp.text.length > 0 ? comp.edit = false : comp.edit = true"
-    >
-
+  />
 </div>

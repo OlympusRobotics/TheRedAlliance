@@ -64,9 +64,13 @@ class PropertyTypes extends Enum {
       {
         levels: [],
       },
+    ],
+    [
       PropertyTypes.MultSelect.toString(),
       {
-        texts : ["No", "Yes"]
+        texts: ["No", "Yes"],
+        // if multiple choices allowed
+        isMult: true
       },
     ],
   ]);
@@ -209,7 +213,7 @@ const LevelSelectRes = (index) => ({
   getAverages(responses) {
     let totals = [0, 0, 0];
     responses.forEach((e) => {
-      for (let i = 0; i<e.responses[index].length; i++) {
+      for (let i = 0; i < e.responses[index].length; i++) {
         this.levels[i] += e.responses[index][i];
       }
     });

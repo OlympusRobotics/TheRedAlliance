@@ -163,3 +163,23 @@ hr.title-hr {
 .level-select-bar.selected {
   border-color: rgb(30, 152, 209);
 }
+
+.mult-choice {
+  border: #2f2f2f solid 2px;
+  border-radius: 1.5rem;
+  padding: 1rem 2.5rem;
+  padding-right: 1rem;
+  transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+  text-align: center;
+}
+
+.mult-choice.add {
+  border: #2bdc4e solid 2px;
+}
+.mult-choice input {
+  width: 60%;
+  font-size: 0.75rem; 
+}
+.mult-choice:hover {
+  border: rgb(30, 152, 209) solid 2px;
+}

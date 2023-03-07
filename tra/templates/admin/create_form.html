@@ -223,7 +223,6 @@
       _saveForm() {
         // dont save first time this function is called
         // TODO: fix
-        console.log("saving");
         fetch("/api/editform/" + this.data.code, {
           credentials: "same-origin",
           method: "POST",

@@ -1,5 +1,56 @@
-<div class="columns is-centered is-vcentered">
-    <template x-for="text in comp.texts">
-        <span x-text="texts"></span>
+<div>
+  <div class="columns mx-3 my-3 is-vcentered is-mobile is-multiline">
+    <template x-for="(text, i) in comp.texts">
+      <div class="column is-narrow">
+        <div x-data="{edit : false, inp : null}" class="mult-choice">
+          <div>
+            <!-- acts exactly like the prompt -->
+            <span
+              @click="async () => {
+                edit = true;
+                await $nextTick(()=>{});
+                inp.select();
+              }"
+              x-show="!edit"
+              x-text="comp.texts[i]"
+              class="title is-5"
+            ></span>
+            <input
+              x-init="inp = $el"
+              x-model="comp.texts[i]"
+              @blur="edit = false"
+              @keyup.enter="edit=false"
+              x-show="edit"
+              type="text"
+              class="input"
+            />
+            <button
+              @click="comp.texts.splice(i, 1)"
+              class="button is-small is-danger ml-4 is-rounded"
+            >
+              <span class="icon">
+                <i class="fa-solid fa-trash-can"></i>
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
     </template>
+    <div class="column is-narrow">
+      <button
+        @click="comp.texts.push('Click to change')"
+        class="button is-primary is-large is-rounded is-outlined"
+      >
+        +
+      </button>
+    </div>
+  </div>
+  <label class="checkbox">
+    <input
+      x-model="comp.isMult"
+      @change="console.log(comp.isMult)"
+      type="checkbox"
+    />
+    Allow Multiple Selections
+  </label>
 </div>
