@@ -171,6 +171,7 @@ const ImageSelectPublic = (index) => ({
     y: 0,
   },
   init() {
+    window.addEventListener()
     this.$watch("img", () => {
       if (this.img != null) {
         // when the img is loaded, get the width and height to scale te coord
@@ -226,6 +227,10 @@ const LevelSelectRes = (index) => ({
 const LevelSelect = (index) => ({
   levels: [0, 0, 0],
   init() {
+    window.addEventListener('submitted', () => {
+      this.levels = [0, 0, 0];
+    });
+
     this.$store.responses[index] = this.levels;
   },
   increment(level, x) {
@@ -241,6 +246,9 @@ const NumInp = (min, max, index) => ({
   min: min,
   max: max,
   init() {
+    window.addEventListener('submitted', () => {
+      this.val = min;
+    });
     this.$store.responses[index] = this.val;
     this.$watch("val", () => {
       this.validate();

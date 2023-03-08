@@ -57,6 +57,9 @@
           .then((req) => (this.forms = req.forms));
       },
       deleteForm(code) {
+        if (!confirm("Are you sure you want to delete this form? (Cannot be undone)")) {
+          return;
+        }
         // delete form then update form list
         fetch("/api/deleteform/" + code)
           .then((req) => checkOk(req))
