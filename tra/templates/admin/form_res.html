@@ -161,9 +161,38 @@
                       <template x-for="i in 3">
                         <div
                           class="level-select-bar"
-                          style="text-align: center; display: block;"
+                          style="text-align: center; display: block"
                         >
-                          <span class="title is-2" x-text="(levels[i-1]).toFixed(2)"></span>
+                          <span
+                            class="title is-2"
+                            x-text="(levels[i-1]).toFixed(2)"
+                          ></span>
+                        </div>
+                      </template>
+                    </div>
+                  </template>
+                  <template
+                    x-if="PropertyTypes.MultSelect.equals(q.components[1].type)"
+                  >
+                    <div
+                      x-data="MultSelectRes(i)"
+                      class="columns is-mobile is-centered is-vcentered"
+                    >
+                      <template x-for="text in q.components[1].texts">
+                        <div class="column is-narrow">
+                          <div
+                            x-data="{ percent : 0 }"
+                            class="mult-choice responses"
+                          >
+                            <div class="bar" :style="{ width : percent }"></div>
+                            <span
+                              x-init="$watch('resMap', (e) => { 
+                                percent = calcPercent(text, e[teamNum]);
+                              })"
+                              x-text="text"
+                              class="title is-4"
+                            ></span>
+                          </div>
                         </div>
                       </template>
                     </div>

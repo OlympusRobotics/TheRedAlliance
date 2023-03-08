@@ -1,0 +1,43 @@
+<div>
+  <div class="columns mx-3 my-3 is-vcentered is-mobile is-multiline">
+    <template x-for="(text, i) in comp.texts">
+      <div class="column is-narrow">
+        <div class="mult-choice">
+          <div>
+            <input
+              @click="$el.select()"
+              @keyup.enter="$el.blur()"
+              x-model="comp.texts[i]"
+              type="text"
+              class="input"
+            />
+            <button
+              @click="comp.texts.splice(i, 1)"
+              class="button is-small is-danger ml-4 is-rounded mt-1"
+            >
+              <span class="icon">
+                <i class="fa-solid fa-trash-can"></i>
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </template>
+    <div class="column is-narrow">
+      <button
+        @click="comp.texts.length <= 8 ? comp.texts.push('Enter an option') : ''"
+        class="button is-primary is-large is-rounded is-outlined"
+        :disabled="comp.texts.length >= 8"
+      >
+        +
+      </button>
+    </div>
+  </div>
+  <label class="checkbox">
+    <input
+      x-model="comp.isMult"
+      type="checkbox"
+    />
+    Allow Multiple Selections
+  </label>
+</div>

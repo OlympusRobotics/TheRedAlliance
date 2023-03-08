@@ -22,6 +22,7 @@ class QuestionTypes extends Enum {
   static ImageSelect = new QuestionTypes("ImageSelect");
   static NumInp = new QuestionTypes("NumInp");
   static LevelSelect = new QuestionTypes("LevelSelect");
+  static MultSelect = new QuestionTypes("MultSelect");
 }
 
 class PropertyTypes extends Enum {
@@ -29,7 +30,8 @@ class PropertyTypes extends Enum {
   static TextBox = new PropertyTypes("TextBox");
   static ImageSelect = new PropertyTypes("ImageSelect");
   static NumInp = new PropertyTypes("NumInp");
-  static LevelSelect = new QuestionTypes("LevelSelect");
+  static LevelSelect = new PropertyTypes("LevelSelect");
+  static MultSelect = new PropertyTypes("MultSelect");
   // contains all the properties for each of the property types
   static templates = new Map([
     [
@@ -61,6 +63,14 @@ class PropertyTypes extends Enum {
       PropertyTypes.LevelSelect.toString(),
       {
         levels: [],
+      },
+    ],
+    [
+      PropertyTypes.MultSelect.toString(),
+      {
+        texts: ["No", "Yes"],
+        // if multiple choices allowed
+        isMult: true
       },
     ],
   ]);
@@ -199,13 +209,12 @@ const getPos = (el) => {
 
 const LevelSelectRes = (index) => ({
   levels: [0, 0, 0],
-  init() {},
   getAverages(responses) {
     if (responses === undefined) 
       return;
 
     responses.forEach((e) => {
-      for (let i = 0; i<e.responses[index].length; i++) {
+      for (let i = 0; i < e.responses[index].length; i++) {
         this.levels[i] += e.responses[index][i];
       }
     });
@@ -239,7 +248,7 @@ const NumInp = (min, max, index) => ({
     });
   },
   validate() {
-    // make sure not to pass
+    // make sure not to pass max and min
     if (parseInt(this.val) > this.max) {
       this.val = this.max;
     }
@@ -247,6 +256,45 @@ const NumInp = (min, max, index) => ({
       this.val = this.min;
     }
   },
+});
+
+const MultSelectRes = (index) => ({
+  calcPercent(text, responses) {
+    if (responses === undefined) {
+      return 0;
+    }
+    let matches = 0;
+    responses.forEach((e) => {
+      if (e.responses[index].includes(text)) {
+        matches++;
+      }
+    });
+    return (matches / responses.length).toFixed(2) * 100 + '%';
+  }
+})
+
+const MultSelect = (isMult, index) => ({
+  isMult: isMult,
+  select : [],
+  init() {
+    window.addEventListener('submitted', () => {
+      this.select = [];
+    });
+  },
+  toggleSelect(text) {
+    // if already selected, remove
+    if (this.select.includes(text)) {
+      this.select.splice(this.select.indexOf(text), 1);
+    } 
+    else {
+      // if the input only allows one selection, clear the other selection
+      if (!this.isMult && this.select.length > 0) {
+        this.select = [];
+      }
+      this.select.push(text)
+    }
+    this.$store.responses[index] = this.select;
+  }
 });
 
 // loads the img into a data url so that it can be used in offline mode

@@ -70,7 +70,9 @@
                       {% include 'properties/number-inp.html' %}
                     </template>
                     <!-- level select -->
-                    <template x-if="PropertyTypes.LevelSelect.equals(comp.type)">
+                    <template
+                      x-if="PropertyTypes.LevelSelect.equals(comp.type)"
+                    >
                       {% include 'properties/level-select.html' %}
                     </template>
                     <!--If it is an image select -->
@@ -78,6 +80,10 @@
                       x-if="PropertyTypes.ImageSelect.equals(comp.type)"
                     >
                       {% include 'properties/imageselect.html' %}
+                    </template>
+                    <!--If it is a multiple choice select -->
+                    <template x-if="PropertyTypes.MultSelect.equals(comp.type)">
+                      {% include 'properties/multselect.html' %}
                     </template>
                   </div>
                 </template>
@@ -90,23 +96,54 @@
   </div>
   <div x-data="{addQuestion : false}">
     <div x-show="!addQuestion">
-        <button
-            :disabled="!(data.questions.length <= 15)"
-            id="add-question"
-            @click="addQuestion = true"
-            class="button is-primary is-medium mt-4"
-            style="width: 100%"
-        >
-            Add New Question
-        </button>
+      <button
+        :disabled="!(data.questions.length <= 15)"
+        id="add-question"
+        @click="addQuestion = true"
+        class="button is-primary is-medium mt-4"
+        style="width: 100%"
+      >
+        Add New Question
+      </button>
     </div>
     <div x-show="addQuestion">
       <div class="buttons are-medium mt-4 is-flex is-justify-content-center">
-          <button @click="createQuestion(QuestionTypes.TextBox)" class="button is-primary">Textbox</button>
-          <button @click="createQuestion(QuestionTypes.ImageSelect)" class="button is-primary">Field Select</button>
-          <button @click="createQuestion(QuestionTypes.NumInp)" class="button is-primary">Number</button>
-          <button @click="createQuestion(QuestionTypes.LevelSelect)" class="button is-primary">Level Select</button>
-          <button @click="addQuestion = false" class="button is-danger is-outlined">X</button>
+        <button
+          @click="createQuestion(QuestionTypes.TextBox)"
+          class="button is-primary"
+        >
+          Textbox
+        </button>
+        <button
+          @click="createQuestion(QuestionTypes.ImageSelect)"
+          class="button is-primary"
+        >
+          Field Select
+        </button>
+        <button
+          @click="createQuestion(QuestionTypes.NumInp)"
+          class="button is-primary"
+        >
+          Number
+        </button>
+        <button
+          @click="createQuestion(QuestionTypes.LevelSelect)"
+          class="button is-primary"
+        >
+          Level Select
+        </button>
+        <button
+          @click="createQuestion(QuestionTypes.MultSelect)"
+          class="button is-primary"
+        >
+          Option Select
+        </button>
+        <button
+          @click="addQuestion = false"
+          class="button is-danger is-outlined"
+        >
+          X
+        </button>
       </div>
     </div>
   </div>
@@ -186,7 +223,6 @@
       _saveForm() {
         // dont save first time this function is called
         // TODO: fix
-        console.log("saving");
         fetch("/api/editform/" + this.data.code, {
           credentials: "same-origin",
           method: "POST",
@@ -242,16 +278,16 @@
     else if (QuestionTypes.ImageSelect.equals(type)) {
       out.push(questionComponent(PropertyTypes.Prompt));
       out.push(questionComponent(PropertyTypes.ImageSelect));
-    } 
-    else if (QuestionTypes.NumInp.equals(type)) {
+    } else if (QuestionTypes.NumInp.equals(type)) {
       out.push(questionComponent(PropertyTypes.Prompt));
       out.push(questionComponent(PropertyTypes.NumInp));
-    }
-    else if (QuestionTypes.LevelSelect.equals(type)) {
+    } else if (QuestionTypes.LevelSelect.equals(type)) {
       out.push(questionComponent(PropertyTypes.Prompt));
       out.push(questionComponent(PropertyTypes.LevelSelect));
-    }
-    else {
+    } else if (QuestionTypes.MultSelect.equals(type)) {
+      out.push(questionComponent(PropertyTypes.Prompt));
+      out.push(questionComponent(PropertyTypes.MultSelect));
+    } else {
       console.warn("Bruh what kind of question is this? " + type);
     }
     return out;

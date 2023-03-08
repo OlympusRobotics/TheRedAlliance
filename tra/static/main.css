@@ -24,7 +24,7 @@ hr.title-hr {
 }
 
 .question-card {
-    border-radius: 10px;
+  border-radius: 10px;
 }
 
 .notification {
@@ -54,8 +54,6 @@ hr.title-hr {
   font-size: 1.2em;
   transition: ease 0.3s;
 }
-
-
 
 .form-card:hover {
   border-radius: 20px;
@@ -106,7 +104,6 @@ hr.title-hr {
 .progress {
   width: 60rem !important;
 }
-
 
 @media screen and (max-width: 700px) {
   .noti-content {
@@ -162,4 +159,57 @@ hr.title-hr {
 
 .level-select-bar.selected {
   border-color: rgb(30, 152, 209);
+}
+
+.mult-choice {
+  border: #2f2f2f solid 2px;
+  border-radius: 1.5rem;
+  padding: 1rem 2.5rem;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  text-align: center;
+}
+
+.mult-choice.selected {
+  border: #2bdc4e solid 2px;
+}
+
+.mult-choice.responses {
+  position:relative;
+}
+
+.mult-choice.responses span {
+  position: inherit;
+  z-index: 2;
+}
+
+.mult-choice.responses .bar {
+  content: "\A";
+  border-radius: 1.5rem;
+  /* border-top-right-radius: 0;
+  border-bottom-right-radius: 0; */
+  position: absolute;
+  background: rgba(114, 239, 255, 0.768);
+  z-index: 1;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 0; /* End width.. */
+  -webkit-animation: filler 2s ease-in-out;
+  -moz-animation: filler 2s ease-in-out;
+  animation: filler 2s ease-in-out;
+}
+
+@keyframes filler {
+  0% {
+    width: 0;
+  }
+}
+@-webkit-keyframes filler {
+  0% {
+    width: 0;
+  }
+}
+.mult-choice input {
+  width: 75%;
+  font-size: 1rem;
 }
