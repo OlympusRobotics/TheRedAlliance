@@ -209,7 +209,6 @@ const getPos = (el) => {
 
 const LevelSelectRes = (index) => ({
   levels: [0, 0, 0],
-  init() {},
   getAverages(responses) {
     let totals = [0, 0, 0];
     responses.forEach((e) => {
@@ -246,7 +245,7 @@ const NumInp = (min, max, index) => ({
     });
   },
   validate() {
-    // make sure not to pass
+    // make sure not to pass max and min
     if (parseInt(this.val) > this.max) {
       this.val = this.max;
     }
@@ -254,6 +253,45 @@ const NumInp = (min, max, index) => ({
       this.val = this.min;
     }
   },
+});
+
+const MultSelectRes = (index) => ({
+  calcPercent(text, responses) {
+    if (responses === undefined) {
+      return 0;
+    }
+    let matches = 0;
+    responses.forEach((e) => {
+      if (e.responses[index].includes(text)) {
+        matches++;
+      }
+    });
+    return (matches / responses.length).toFixed(2) * 100 + '%';
+  }
+})
+
+const MultSelect = (isMult, index) => ({
+  isMult: isMult,
+  select : [],
+  init() {
+    window.addEventListener('submitted', () => {
+      this.select = [];
+    });
+  },
+  toggleSelect(text) {
+    // if already selected, remove
+    if (this.select.includes(text)) {
+      this.select.splice(this.select.indexOf(text), 1);
+    } 
+    else {
+      // if the input only allows one selection, clear the other selection
+      if (!this.isMult && this.select.length > 0) {
+        this.select = [];
+      }
+      this.select.push(text)
+    }
+    this.$store.responses[index] = this.select;
+  }
 });
 
 // loads the img into a data url so that it can be used in offline mode

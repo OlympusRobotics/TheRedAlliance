@@ -40,6 +40,10 @@
                 <template x-if="PropertyTypes.LevelSelect.equals(comp.type)">
                   {% include 'public/components/level-select.html' %}
                 </template>
+                <!--Multiple Select-->
+                <template x-if="PropertyTypes.MultSelect.equals(comp.type)">
+                  {% include 'public/components/multselect.html' %}
+                </template>
               </div>
             </template>
             <hr />
@@ -161,6 +165,7 @@
         this.teamNum = "";
         // init empty response list.
         Alpine.store("responses", Array(this.questions.length).fill(""));
+        this.$dispatch('submitted');
       },
     };
   }

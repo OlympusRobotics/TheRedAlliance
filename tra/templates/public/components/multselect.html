@@ -1,0 +1,12 @@
+<div
+  x-data="MultSelect(comp.isMult, index)"
+  class="columns mx-3 my-3 is-vcentered is-mobile is-multiline"
+>
+  <template x-for="text in comp.texts">
+    <div class="column is-narrow">
+      <div @click="toggleSelect(text)" class="mult-choice" :class="select.includes(text) ? 'selected' : ''">
+        <span x-text="text" class="title is-4"></span> 
+      </div>
+    </div>
+  </template>
+</div>
