@@ -142,6 +142,7 @@ def get_forms():
 
 
 @bp.route("/respond/<code>", methods=["POST"])
+@limiter.limit("100/second")
 def respond(code):
     form = Form.query.filter_by(code=code).first_or_404()
     response = request.json["responses"]
