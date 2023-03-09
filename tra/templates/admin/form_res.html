@@ -18,7 +18,10 @@
   <div class="columns is-mobile is-centered">
     <div class="column is-two-thirds-desktop is-full-mobile">
       <template x-for="teamNum in teamNums">
-        <div x-data="{show:false}" class="my-4">
+        <div x-data="{
+          show:false,
+          loading:false,
+        }" class="my-4">
           <div
             class="box question-card is-flex is-justify-content-space-between"
             style="background-color: #e9e9e9"
@@ -26,8 +29,28 @@
             <span x-text="'Team #'+ teamNum" class="is-medium label"></span>
             <button
               x-text="show ? 'Close' : 'Open Profile'"
-              @click="show = !show"
+              @click="() => {
+                if (!show) {
+                  // check if data for this team has already been fetched
+                  if (!resMap[teamNum]) {
+                    loading = true;
+                    getResponses(teamNum)
+                    .then(data => { 
+                      resMap[teamNum] = data; 
+                      show = true;
+                      loading = false;
+                    });
+                  // otherwise just open
+                  } else {
+                    show = true;
+                  }
+                }
+                else {
+                  show = false;
+                }
+              }"
               class="is-primary button"
+              :class="loading ? 'is-loading' : ''"
             ></button>
           </div>
           <!-- <template x-if="show"> -->
@@ -249,10 +272,7 @@
       window.addEventListener("updateRes", (e) => this.updateRes(e));
 
       // build map
-      for (const num of this.teamNums) {
-        this.getResponses(num).then((e) => {this.resMap[num] = e;} );
-      }
-      await this.$nextTick();
+
     },
     async getNums() {
       await fetch("/api/getteamnums/" + this.code, {
