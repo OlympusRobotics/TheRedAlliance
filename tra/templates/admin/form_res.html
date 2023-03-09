@@ -250,7 +250,7 @@
 
       // build map
       for (const num of this.teamNums) {
-        this.resMap[num] = await this.getResponses(num);
+        this.getResponses(num).then((e) => {this.resMap[num] = e;} );
       }
       await this.$nextTick();
     },

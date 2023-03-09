@@ -171,7 +171,6 @@ const ImageSelectPublic = (index) => ({
     y: 0,
   },
   init() {
-    window.addEventListener()
     this.$watch("img", () => {
       if (this.img != null) {
         // when the img is loaded, get the width and height to scale te coord
