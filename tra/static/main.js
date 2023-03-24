@@ -23,6 +23,10 @@ class QuestionTypes extends Enum {
   static NumInp = new QuestionTypes("NumInp");
   static LevelSelect = new QuestionTypes("LevelSelect");
   static MultSelect = new QuestionTypes("MultSelect");
+
+  // frc 2023 question types
+  static CubesCones = new QuestionTypes("CubesCones");
+  static Balanced = new QuestionTypes("Balanced");
 }
 
 class PropertyTypes extends Enum {
@@ -32,6 +36,10 @@ class PropertyTypes extends Enum {
   static NumInp = new PropertyTypes("NumInp");
   static LevelSelect = new PropertyTypes("LevelSelect");
   static MultSelect = new PropertyTypes("MultSelect");
+
+  static CubesCones = new PropertyTypes("CubesCones");
+  static Balanced = new PropertyTypes("Balanced");
+
   // contains all the properties for each of the property types
   static templates = new Map([
     [
@@ -73,6 +81,17 @@ class PropertyTypes extends Enum {
         isMult: true
       },
     ],
+    [
+      PropertyTypes.CubesCones.toString(),
+      {
+      },
+    ],
+    [
+      PropertyTypes.Balanced.toString(),
+      {
+      },
+    ],
+
   ]);
 }
 
@@ -210,7 +229,7 @@ const getPos = (el) => {
 const LevelSelectRes = (index) => ({
   levels: [0, 0, 0],
   getAverages(responses) {
-    if (responses === undefined) 
+    if (responses === undefined)
       return;
 
     responses.forEach((e) => {
@@ -218,7 +237,7 @@ const LevelSelectRes = (index) => ({
         this.levels[i] += e.responses[index][i];
       }
     });
-      
+
     this.levels = this.levels.map((e) => e / responses.length);
   },
 });
@@ -282,7 +301,7 @@ const MultSelectRes = (index) => ({
 
 const MultSelect = (isMult, index) => ({
   isMult: isMult,
-  select : [],
+  select: [],
   init() {
     window.addEventListener('submitted', () => {
       this.select = [];
@@ -292,7 +311,7 @@ const MultSelect = (isMult, index) => ({
     // if already selected, remove
     if (this.select.includes(text)) {
       this.select.splice(this.select.indexOf(text), 1);
-    } 
+    }
     else {
       // if the input only allows one selection, clear the other selection
       if (!this.isMult && this.select.length > 0) {

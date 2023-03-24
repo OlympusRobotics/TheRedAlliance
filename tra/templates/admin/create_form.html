@@ -23,13 +23,8 @@
       </div>
       <div class="field-body">
         <div class="field">
-          <input
-            maxlength="40"
-            x-model="data.name"
-            class="input"
-            type="text"
-            placeholder="Title e.g. 2022 Rapid React"
-          />
+          <input maxlength="40" x-model="data.name" class="input" type="text"
+            placeholder="Title e.g. 2022 Rapid React" />
         </div>
       </div>
     </div>
@@ -42,19 +37,10 @@
           <!-- whenever questions changes, save it to localstorage -->
           <template x-data x-for="question in data.questions">
             <!-- div just to hold child elements. Also scrolls down when created -->
-            <div
-              x-init="$nextTick(() => {window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})})"
-            >
-              <button
-                @click="removeQuestion(question)"
-                style="float: right"
-                class="delete is-medium"
-              ></button>
+            <div x-init="$nextTick(() => {window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})})">
+              <button @click="removeQuestion(question)" style="float: right" class="delete is-medium"></button>
               <div class="box mt-5">
-                <template
-                  x-id="['text-input', 'question-prompt']"
-                  x-for="comp in question.components"
-                >
+                <template x-id="['text-input', 'question-prompt']" x-for="comp in question.components">
                   <!-- div required because template with x-for can only have one root element -->
                   <div>
                     <!--If it is a prompt-->
@@ -70,20 +56,20 @@
                       {% include 'properties/number-inp.html' %}
                     </template>
                     <!-- level select -->
-                    <template
-                      x-if="PropertyTypes.LevelSelect.equals(comp.type)"
-                    >
+                    <template x-if="PropertyTypes.LevelSelect.equals(comp.type)">
                       {% include 'properties/level-select.html' %}
                     </template>
                     <!--If it is an image select -->
-                    <template
-                      x-if="PropertyTypes.ImageSelect.equals(comp.type)"
-                    >
+                    <template x-if="PropertyTypes.ImageSelect.equals(comp.type)">
                       {% include 'properties/imageselect.html' %}
                     </template>
                     <!--If it is a multiple choice select -->
                     <template x-if="PropertyTypes.MultSelect.equals(comp.type)">
                       {% include 'properties/multselect.html' %}
+                    </template>
+                    <!-- cubes and cones -->
+                    <template x-if="PropertyTypes.CubesCones.equals(comp.type)">
+                      {% include 'properties/cubescones.html' %}
                     </template>
                   </div>
                 </template>
@@ -96,52 +82,29 @@
   </div>
   <div x-data="{addQuestion : false}">
     <div x-show="!addQuestion">
-      <button
-        :disabled="!(data.questions.length <= 15)"
-        id="add-question"
-        @click="addQuestion = true"
-        class="button is-primary is-medium mt-4"
-        style="width: 100%"
-      >
+      <button :disabled="!(data.questions.length <= 15)" id="add-question" @click="addQuestion = true"
+        class="button is-primary is-medium mt-4" style="width: 100%">
         Add New Question
       </button>
     </div>
     <div x-show="addQuestion">
-      <div class="buttons are-medium mt-4 is-flex is-justify-content-center">
-        <button
-          @click="createQuestion(QuestionTypes.TextBox)"
-          class="button is-primary"
-        >
-          Textbox
-        </button>
-        <button
-          @click="createQuestion(QuestionTypes.ImageSelect)"
-          class="button is-primary"
-        >
-          Field Select
-        </button>
-        <button
-          @click="createQuestion(QuestionTypes.NumInp)"
-          class="button is-primary"
-        >
-          Number
-        </button>
-        <button
-          @click="createQuestion(QuestionTypes.LevelSelect)"
-          class="button is-primary"
-        >
-          Level Select
-        </button>
-        <button
-          @click="createQuestion(QuestionTypes.MultSelect)"
-          class="button is-primary"
-        >
-          Option Select
-        </button>
-        <button
-          @click="addQuestion = false"
-          class="button is-danger is-outlined"
-        >
+      <div x-data="{currentFolder:[]}" class="buttons are-medium mt-4 is-flex is-justify-content-center">
+        <!-- general -->
+        <div x-show="currentFolder.length === 0">
+          <button @click="currentFolder = questionFolders.general" class="button is-success">General</button>
+          <!-- frc 2023 -->
+          <button @click="currentFolder = questionFolders.frc2023" class="button is-success">FRC 2023</button>
+        </div>
+
+        <template x-for="q in currentFolder">
+          <button x-text="q.name" @click="createQuestion(q.type)" class="button is-primary"></button>
+        </template>
+
+        <!-- only show back button if currentFolder len greater than one  -->
+        <template x-if="currentFolder.length > 1">
+          <button @click="currentFolder = []" class="button is-info is-outlined mx-2">Back</button>
+        </template>
+        <button @click="addQuestion = false" class="button is-danger mx-2 is-outlined">
           X
         </button>
       </div>
@@ -149,6 +112,24 @@
   </div>
 </section>
 <script>
+
+  let questionFolders = {
+    general: [
+      { name: "Prompt", type: QuestionTypes.Prompt },
+      { name: "Text Input", type: QuestionTypes.TextBox },
+      { name: "Number Input", type: QuestionTypes.NumInp },
+      { name: "Level Select", type: QuestionTypes.LevelSelect },
+      { name: "Image Select", type: QuestionTypes.ImageSelect },
+      { name: "Multiple Choice", type: QuestionTypes.MultSelect },
+    ],
+    frc2023: [
+      {name : "CubesCones", type : QuestionTypes.CubesCones},
+      {name : "Charge Pad", type : QuestionTypes.ChargePad},
+    ]
+  }
+
+
+
   function formCreator() {
     return {
       // data that is saved to server
@@ -172,7 +153,7 @@
               return "";
             };
           } else {
-            window.onbeforeunload = () => {}; // remove event listener
+            window.onbeforeunload = () => { }; // remove event listener
           }
         });
       },
@@ -276,18 +257,31 @@
     }
     // if it is an image select question
     else if (QuestionTypes.ImageSelect.equals(type)) {
+
       out.push(questionComponent(PropertyTypes.Prompt));
       out.push(questionComponent(PropertyTypes.ImageSelect));
     } else if (QuestionTypes.NumInp.equals(type)) {
+
       out.push(questionComponent(PropertyTypes.Prompt));
       out.push(questionComponent(PropertyTypes.NumInp));
     } else if (QuestionTypes.LevelSelect.equals(type)) {
+
       out.push(questionComponent(PropertyTypes.Prompt));
       out.push(questionComponent(PropertyTypes.LevelSelect));
     } else if (QuestionTypes.MultSelect.equals(type)) {
+
       out.push(questionComponent(PropertyTypes.Prompt));
       out.push(questionComponent(PropertyTypes.MultSelect));
-    } else {
+    } else if (QuestionTypes.CubesCones.equals(type)) {
+
+      out.push(questionComponent(PropertyTypes.Prompt));
+      out.push(questionComponent(PropertyTypes.CubesCones));
+    } else if (QuestionTypes.Balanced.equals(type)) {
+
+      out.push(questionComponent(PropertyTypes.Prompt));
+      out.push(questionComponent(PropertyTypes.Balanced));
+    }
+    else {
       console.warn("Bruh what kind of question is this? " + type);
     }
     return out;
