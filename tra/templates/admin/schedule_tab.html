@@ -1,0 +1,23 @@
+<div x-data="ScheduleManager()" class="container mt-4">
+  <div class="columns is-mobile is-centered">
+    <div class="column">
+      <div class="form-card is-flex is-justify-content-center">
+        <div>
+          <a class="button is-primary is-large" @click="createSchedule()"
+            >Create New Scouting Schedule +</a
+          >
+        </div>
+      </div>
+      <template x-for="schedule in schedules">
+        <div class="form-card">
+          <div x-text="schedule.name" class="name"></div>
+          <a
+            @click="delSchedule(schedule.id)"
+            class="button is-outlined is-danger"
+            >Delete</a
+          >
+        </div>
+      </template>
+    </div>
+  </div>
+</div>

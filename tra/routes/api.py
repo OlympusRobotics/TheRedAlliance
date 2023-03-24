@@ -7,7 +7,7 @@ import string
 from tra import db, limiter
 from tra.helpers import authorized
 from werkzeug.utils import secure_filename
-from tra.models import Admin, Form, FormQuestion, Team, Response
+from tra.models import Admin, Form, FormQuestion, Team, Response, ScoutingSchedule
 from flask import Blueprint, request, render_template, session, jsonify, abort, flash
 
 bp = Blueprint("api", __name__, url_prefix="/api")
@@ -139,6 +139,33 @@ def get_forms():
             {"code": form.code, "name": form.name, "draft": form.draft})
 
     return {"forms": forms}
+
+@bp.route("/createschedule", methods=["POST"])
+def create_schedule():
+    admin = authorized(session)
+    schedule = ScoutingSchedule(admin=admin, name="hello", data=json.dumps({ "name": "hello" }))
+
+    db.session.add(schedule)
+    db.session.commit()
+    return jsonify(id=schedule.id)
+
+@bp.route("/deleteschedule/<id>", methods=["POST"])
+def del_schedule(id):
+    admin = authorized(session)
+    schedule = ScoutingSchedule.query.filter_by(admin=admin, id=id).first_or_404()
+    db.session.delete(schedule)
+    db.session.commit()
+    return jsonify(status=200)
+
+@bp.route("/getschedules", methods=["GET"])
+def get_schedules():
+    admin = authorized(session)
+    schedules = ScoutingSchedule.query.filter_by(admin=admin)
+    return {'data' : [{
+            "id" : schedule.id,
+            "name" : schedule.name,
+            "data" : schedule.data
+        } for schedule in schedules]}
 
 
 @bp.route("/respond/<code>", methods=["POST"])

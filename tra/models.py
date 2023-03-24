@@ -23,6 +23,7 @@ class Admin(db.Model):
     # key for authenticating the admin
     key = db.Column(db.String(512), nullable=True)
     forms = db.relationship("Form", backref="admin")
+    schedules = db.relationship("ScoutingSchedule", backref="admin")
 
     def __repr__(self):
         return f"Admin {self.username} | {self.password} | {self.key}"
@@ -74,3 +75,9 @@ class Response(db.Model):
     data = db.Column(db.Text, nullable=False)
     form_id = db.Column(db.Integer, db.ForeignKey("form.id"), nullable=False)
     team_id = db.Column(db.Integer, db.ForeignKey("team.id"), nullable=False)
+
+class ScoutingSchedule(db.Model):
+    id = db.Column("id", db.Integer, primary_key=True)  # pk
+    admin_id = db.Column(db.Integer, db.ForeignKey("admin.id"), nullable=False)
+    name = db.Column(db.String(16), nullable=False)
+    data = db.Column(db.Text, nullable=False)

@@ -1,47 +1,86 @@
-{% extends 'base.html' %}
-
-{% block content %}
+{% extends 'base.html' %} {% block content %}
 
 <h1 class="title is-2">Admin Dashboard</h1>
 <h1 class="title is-5">{{admin.username}}</h1>
-<hr class="title-hr">
-<div x-data="tabsManager()"> 
-    <div id="dash-tabs" class="container">
-        <div class="tabs is-large">
-            <ul>
-                <li @click="show(0)" id="forms" :class="{ 'is-active' : states[0] }"><a>Forms</a></li>
-                <!-- <li @click="show(1)" id="data":class="{ 'is-active' : states[1] }"><a>Data</a></li>
-                <li @click="show(2)" id="settings" :class="{ 'is-active' : states[2] }"><a>Settings</a></li> -->
-            </ul>
-        </div>
-
+<hr class="title-hr" />
+<div x-data="tabsManager()">
+  <div id="dash-tabs" class="container">
+    <div class="tabs is-large">
+      <ul>
+        <li @click="show(0)" id="forms" :class="{ 'is-active' : states[0] }">
+          <a>Forms</a>
+        </li>
+        <li
+          @click="show(1)"
+          id="schedules"
+          :class="{ 'is-active' : states[1] }"
+        >
+          <a>Schedules</a>
+        </li>
+        <!-- <li @click="show(2)" id="settings" :class="{ 'is-active' : states[2] }"><a>Settings</a></li> -->
+      </ul>
     </div>
-    <!--
+  </div>
+  <!--
         By having a manager, all the tabs can interact and share data easily. 
         Sub-components also can access this data if needed so globals should be kept here
     -->
-    <section x-show="states[0]" id="forms-tab">
-        {% include 'admin/forms_tab.html' %}
-    </section>
-    <section x-show="states[1]" id="data-tab">
-        Data
-    </section>
-    <section x-show="states[2]" id="settings-tab">
-        Settings
-    </section>
+  <section x-show="states[0]" id="forms-tab">
+    {% include 'admin/forms_tab.html' %}
+  </section>
+  <section x-show="states[1]" id="schedules-tab">
+    {% include 'admin/schedule_tab.html'%}
+  </section>
+  <section x-show="states[2]" id="settings-tab">Settings</section>
 </div>
 <script>
-function tabsManager() {
+  function tabsManager() {
     return {
-        states : new Array(3).fill(false), // fill the array with false.
-        init() {
-            this.show(0); //show the form tab when page loads
-        },
-        show(tabNumber) {
-            this.states.fill(false); // hide all the tabs
-            this.states[tabNumber] = true;
-        }
-    }
-}
+      states: new Array(3).fill(false), // fill the array with false.
+      init() {
+        this.show(0); //show the form tab when page loads
+      },
+      show(tabNumber) {
+        this.states.fill(false); // hide all the tabs
+        this.states[tabNumber] = true;
+      },
+    };
+  }
+
+  const ScheduleManager = () => ({
+    schedules: [],
+    async init() {
+      await this.getSchedules();
+    },
+    async getSchedules() {
+      fetch("/api/getschedules", {
+        credentials: "same-origin",
+      })
+        .then((res) => checkOk(res))
+        .then((res) => (this.schedules = res.data));
+    },
+    createSchedule() {
+      fetch("/api/createschedule", {
+        credentials: "same-origin",
+        method: "POST",
+      })
+        .then((res) => checkOk(res))
+        .then((res) => {
+          notify("Schedule Created", "is-success");
+          location.href = location.origin + "/admin/makeschedule/" + res.id;
+        });
+    },
+    async delSchedule(id) {
+      fetch("/api/deleteschedule/" + id, {
+        credentials: "same-origin",
+        method: "POST",
+      })
+        .then((res) => checkOk(res))
+        .then((res) => {
+          notify("Schedule Deleted", "is-danger");
+          this.getSchedules();
+        });
+    },
+  });
 </script>
 {% endblock %}

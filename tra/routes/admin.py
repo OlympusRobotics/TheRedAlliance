@@ -2,7 +2,7 @@
 
 import secrets
 from tra import db
-from tra.models import Admin, Form, FormQuestion
+from tra.models import Admin, Form, FormQuestion, ScoutingSchedule
 from .api import validate_username
 from tra.helpers import authorized, sanitize, set_key
 from flask import (
@@ -95,6 +95,15 @@ def edit_form():
     ).first_or_404()
     return render_template("admin/create_form.html")
 
+@bp.route("/makeschedule/<id>", methods=["GET"])
+def create_schedule(id):
+    admin = authorized(session, abort_on_fail=False)
+    # if not logged in, the user probably is trying to use the form
+    if admin is None:
+        return redirect(url_for("main.schedule", id=id))
+    
+    schedule = ScoutingSchedule.query.filter_by(admin=admin, id=id).first_or_404()
+    return render_template("admin/create_schedule.html")
 
 # if whoever is unauthorized, redirect them to the login page
 # this obviously only needs to be on this route
